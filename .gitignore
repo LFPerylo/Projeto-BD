@@ -1,10 +1,33 @@
 HELP.md
+
+# ========== MAVEN / JAVA ==========
 target/
+*.log
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven wrapper
 !.mvn/wrapper/maven-wrapper.jar
+
+# Evita rastrear targets dentro de subpastas de src
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### STS ###
+# ========== SPRING BOOT ==========
+spring-boot-devtools.properties
+*.env
+application.properties
+application.yml
+
+# ========== IntelliJ IDEA ==========
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# ========== STS (Spring Tool Suite) ==========
 .apt_generated
 .classpath
 .factorypath
@@ -13,13 +36,7 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
+# ========== NetBeans ==========
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -29,5 +46,14 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
+# ========== VS Code ==========
 .vscode/
+
+# ========== SISTEMA ==========
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========== GIT ==========
+*.swp
+*.swo
