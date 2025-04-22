@@ -23,3 +23,15 @@ Este é um sistema Java + MySQL desenvolvido com **Spring Boot** (sem JPA) que r
 ```bash
 git clone https://github.com/LFPerylo/Projeto-BD.git
 cd Projeto-BD
+
+## 📚 Documentação do Banco de Dados
+
+### 🧠 Modelos
+
+- [Modelo Conceitual](documentacao/Conceitual_Projeto_Final.png)
+- [Modelo Lógico](documentacao/Logico_Projeto_Final.png)
+
+### 📜 Scripts SQL
+
+- [Script de Criação das Tabelas](documentacao/Script-Projeto.sql)
+- [Script de Inserção de Dados](documentacao/Script-insercao-projeto.sql)
