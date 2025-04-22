@@ -14,6 +14,14 @@ public class PessoaFisica extends Cliente {
         this.rg = rg;
     }
 
+    public PessoaFisica(Cliente cliente) {
+        super(cliente.getCodCliente(), cliente.getNome(), cliente.getEmail(), cliente.getRua(),
+                cliente.getNumero(), cliente.getBairro(), cliente.getCidade(), cliente.getEstado(),
+                cliente.getCpf(), cliente.getRg(), null, null, null);
+        this.cpf = cliente.getCpf();
+        this.rg = cliente.getRg();
+    }
+
     public String getCpf() {
         return cpf;
     }
@@ -29,4 +37,5 @@ public class PessoaFisica extends Cliente {
     public void setRg(String rg) {
         this.rg = rg;
     }
+
 }

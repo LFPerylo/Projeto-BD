@@ -1,7 +1,7 @@
-HELP.md
+../HELP.md
 
 # ========== MAVEN / JAVA ==========
-target/
+BackEnd/target/
 *.log
 *.class
 *.jar
@@ -9,7 +9,7 @@ target/
 *.ear
 
 # Maven wrapper
-!.mvn/wrapper/maven-wrapper.jar
+!../.mvn/wrapper/maven-wrapper.jar
 
 # Evita rastrear targets dentro de subpastas de src
 !**/src/main/**/target/
@@ -57,4 +57,4 @@ desktop.ini
 # ========== GIT ==========
 *.swp
 *.swo
-.env
+BackEnd/.env

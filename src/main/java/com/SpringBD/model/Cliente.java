@@ -9,6 +9,13 @@ public class Cliente {
     private String bairro;
     private String cidade;
     private String estado;
+    // Dentro da classe Cliente
+    private String cpf;
+    private String rg;
+    private String cnpj;
+    private String inscricaoEstadual;
+    private String razaoSocial;
+
 
     public Cliente() {
     }
@@ -21,7 +28,29 @@ public class Cliente {
         this.bairro = bairro;
         this.cidade = cidade;
         this.estado = estado;
+
     }
+
+    public Cliente(int codCliente, String nome, String email, String rua, int numero,
+                   String bairro, String cidade, String estado,
+                   String cpf, String rg,
+                   String cnpj, String inscricaoEstadual, String razaoSocial) {
+        this.codCliente = codCliente;
+        this.nome = nome;
+        this.email = email;
+        this.rua = rua;
+        this.numero = numero;
+        this.bairro = bairro;
+        this.cidade = cidade;
+        this.estado = estado;
+        this.cpf = cpf;
+        this.rg = rg;
+        this.cnpj = cnpj;
+        this.inscricaoEstadual = inscricaoEstadual;
+        this.razaoSocial = razaoSocial;
+    }
+
+
 
     public int getCodCliente() {
         return codCliente;
@@ -85,5 +114,45 @@ public class Cliente {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public String getRg() {
+        return rg;
+    }
+
+    public void setRg(String rg) {
+        this.rg = rg;
+    }
+
+    public String getCnpj() {
+        return cnpj;
+    }
+
+    public void setCnpj(String cnpj) {
+        this.cnpj = cnpj;
+    }
+
+    public String getInscricaoEstadual() {
+        return inscricaoEstadual;
+    }
+
+    public void setInscricaoEstadual(String inscricaoEstadual) {
+        this.inscricaoEstadual = inscricaoEstadual;
+    }
+
+    public String getRazaoSocial() {
+        return razaoSocial;
+    }
+
+    public void setRazaoSocial(String razaoSocial) {
+        this.razaoSocial = razaoSocial;
     }
 }
