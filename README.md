@@ -83,5 +83,5 @@ src/main/java/com/SpringBD/SpringBdApplication.java
 
 ## 📄 Licença
 
-Este projeto é apenas para fins acadêmicos 🚀
+Este projeto está licenciado sob os termos da [Licença MIT](LICENSE).
 ```
