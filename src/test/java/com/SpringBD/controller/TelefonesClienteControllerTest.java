@@ -25,6 +25,8 @@ public class TelefonesClienteControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private final int codClienteExistente = 1;
+
     @Test
     @DisplayName("Deve listar todos os telefones")
     void testListarTelefones() throws Exception {
@@ -34,9 +36,10 @@ public class TelefonesClienteControllerTest {
     }
 
     @Test
-    @DisplayName("Deve inserir novo telefone para cliente existente")
+    @DisplayName("Deve inserir novo telefone para cliente existente (evitando duplicata)")
     void testInserirTelefone() throws Exception {
-        TelefonesCliente telefone = new TelefonesCliente(1, "81999990000");
+        String telefoneAleatorio = "8199" + (int)(Math.random() * 1000000);
+        TelefonesCliente telefone = new TelefonesCliente(codClienteExistente, telefoneAleatorio);
 
         mockMvc.perform(post("/telefones")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -47,20 +50,38 @@ public class TelefonesClienteControllerTest {
     @Test
     @DisplayName("Deve atualizar o telefone existente")
     void testAtualizarTelefone() throws Exception {
-        TelefonesCliente telefone = new TelefonesCliente(1, "81988887777");
+        // Inserir telefone original para garantir que exista
+        String telefoneOriginal = "81988887777";
+        TelefonesCliente original = new TelefonesCliente(codClienteExistente, telefoneOriginal);
 
+        mockMvc.perform(post("/telefones")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(original)))
+                .andExpect(status().isOk());
+
+        // Atualizar o mesmo número (simulação de regravação)
         mockMvc.perform(put("/telefones")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(telefone)))
+                        .content(objectMapper.writeValueAsString(original)))
                 .andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("Deve deletar o telefone existente")
     void testDeletarTelefone() throws Exception {
+        String telefoneParaDeletar = "81988887777";
+
+        // Primeiro, garantir que o telefone esteja cadastrado
+        TelefonesCliente t = new TelefonesCliente(codClienteExistente, telefoneParaDeletar);
+        mockMvc.perform(post("/telefones")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(t)))
+                .andExpect(status().isOk());
+
+        // Em seguida, deletar
         mockMvc.perform(delete("/telefones")
-                        .param("codCliente", "1")
-                        .param("telefone", "81988887777"))
+                        .param("codCliente", String.valueOf(codClienteExistente))
+                        .param("telefone", telefoneParaDeletar))
                 .andExpect(status().isOk());
     }
 }

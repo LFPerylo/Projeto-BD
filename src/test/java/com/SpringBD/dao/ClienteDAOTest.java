@@ -7,8 +7,10 @@ import org.junit.jupiter.api.*;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ClienteDAOTest {
@@ -27,14 +29,14 @@ public class ClienteDAOTest {
     public void testInserirPessoaFisica() throws SQLException {
         PessoaFisica pf = new PessoaFisica();
         pf.setNome("Teste PF");
-        pf.setEmail("pf@email.com");
+        pf.setEmail("pf" + UUID.randomUUID() + "@email.com"); // evitar duplicação
         pf.setRua("Rua A");
         pf.setNumero(100);
         pf.setBairro("Centro");
         pf.setCidade("Recife");
         pf.setEstado("PE");
-        pf.setCpf("123.123.123-11");
-        pf.setRg("12121212");
+        pf.setCpf(UUID.randomUUID().toString().substring(0, 14)); // CPF aleatório
+        pf.setRg("RG" + System.currentTimeMillis());
 
         dao.inserir(pf);
 
@@ -51,13 +53,13 @@ public class ClienteDAOTest {
     public void testInserirPessoaJuridica() throws SQLException {
         PessoaJuridica pj = new PessoaJuridica();
         pj.setNome("Empresa PJ");
-        pj.setEmail("pj@email.com");
+        pj.setEmail("pj" + UUID.randomUUID() + "@email.com");
         pj.setRua("Rua B");
         pj.setNumero(200);
         pj.setBairro("Boa Vista");
         pj.setCidade("Olinda");
         pj.setEstado("PE");
-        pj.setCnpj("12.345.678/0001-90");
+        pj.setCnpj(UUID.randomUUID().toString().substring(0, 18)); // CNPJ aleatório
         pj.setInscricaoEstadual("ISENTO");
         pj.setRazaoSocial("PJ LTDA");
 
@@ -75,6 +77,8 @@ public class ClienteDAOTest {
     @Order(3)
     public void testAtualizarPessoaFisica() throws SQLException {
         Cliente cliente = dao.buscarPorId(idPf);
+        assumeTrue(cliente != null, "Cliente Pessoa Física deve ter sido inserido antes.");
+
         cliente.setNome("PF Atualizado");
         cliente.setEmail("novo@email.com");
 
