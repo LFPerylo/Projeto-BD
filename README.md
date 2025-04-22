@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/9a074de0-dc64-4a39-b60b-e53fa8003aed)# 🎉 Projeto de Banco de Dados - Sistema de Gerenciamento de Festas Infantis
+# 🎉 Projeto de Banco de Dados - Sistema de Gerenciamento de Festas Infantis
 
 Este projeto foi desenvolvido com **Java (Spring Boot)** e **MySQL**, com foco na criação de um sistema CRUD completo, sem uso de frameworks de persistência como JPA ou Hibernate. Toda a comunicação com o banco é feita por meio de comandos SQL puros via **JDBC**.
 
