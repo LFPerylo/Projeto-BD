@@ -21,5 +21,5 @@ Este é um sistema Java + MySQL desenvolvido com **Spring Boot** (sem JPA) que r
 ## 📁 Clonando o Projeto
 
 ```bash
-git clone https://github.com/SEU-USUARIO/Projeto-BD.git
+git clone https://github.com/LFPerylo/Projeto-BD.git
 cd Projeto-BD
