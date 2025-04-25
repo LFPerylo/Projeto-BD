@@ -1,28 +1,32 @@
-// AniversarianteDAO.java
 package com.SpringBD.dao;
 
 import com.SpringBD.config.ConexaoBD;
 import com.SpringBD.model.Aniversariante;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AniversarianteDAO {
 
-    public void inserir(Aniversariante a) throws SQLException {
+    public int inserir(Aniversariante a) throws SQLException {
         String sql = "INSERT INTO Aniversariante (Nome, Idade, Data_Nascimento) VALUES (?, ?, ?)";
 
         try (Connection conn = ConexaoBD.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, a.getNome());
             stmt.setInt(2, a.getIdade());
             stmt.setDate(3, Date.valueOf(a.getDataNascimento()));
 
             stmt.executeUpdate();
+
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1); // Retorna o Cod_Aniversariante auto_increment
+            }
         }
+        return -1; // Em caso de erro
     }
 
     public List<Aniversariante> listarTodos() throws SQLException {

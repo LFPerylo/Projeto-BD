@@ -1,4 +1,3 @@
-// Modelo: Aniversariante.java
 package com.SpringBD.model;
 
 import java.time.LocalDate;
@@ -13,6 +12,13 @@ public class Aniversariante {
 
     public Aniversariante(int codAniversariante, String nome, int idade, LocalDate dataNascimento) {
         this.codAniversariante = codAniversariante;
+        this.nome = nome;
+        this.idade = idade;
+        this.dataNascimento = dataNascimento;
+    }
+
+    // ✅ NOVO construtor sem o código
+    public Aniversariante(String nome, int idade, LocalDate dataNascimento) {
         this.nome = nome;
         this.idade = idade;
         this.dataNascimento = dataNascimento;

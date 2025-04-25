@@ -1,26 +1,32 @@
-// FestaDAO.java
 package com.SpringBD.dao;
 
 import com.SpringBD.config.ConexaoBD;
 import com.SpringBD.model.Festa;
 
 import java.sql.*;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FestaDAO {
-    public void inserir(Festa festa) throws SQLException {
+
+    public int inserir(Festa festa) throws SQLException {
         String sql = "INSERT INTO Festa (Num_Contrato, Horario_Fim, Cod_Tema) VALUES (?, ?, ?)";
 
         try (Connection conn = ConexaoBD.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setInt(1, festa.getNumContrato());
             stmt.setTime(2, Time.valueOf(festa.getHorarioFim()));
             stmt.setInt(3, festa.getCodTema());
+
             stmt.executeUpdate();
+
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1); // retorna Cod_Festa gerado (auto_increment)
+            }
         }
+        return -1; // erro
     }
 
     public List<Festa> listarTodos() throws SQLException {
@@ -60,8 +66,8 @@ public class FestaDAO {
                         rs.getInt("Cod_Tema")
                 );
             }
-            return null;
         }
+        return null;
     }
 
     public void atualizar(Festa festa) throws SQLException {

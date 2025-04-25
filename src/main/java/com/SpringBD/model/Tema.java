@@ -13,6 +13,12 @@ public class Tema {
         this.descricao = descricao;
     }
 
+    // ✅ Adicione este construtor:
+    public Tema(String nome, String descricao) {
+        this.nome = nome;
+        this.descricao = descricao;
+    }
+
     public int getCodTema() {
         return codTema;
     }
