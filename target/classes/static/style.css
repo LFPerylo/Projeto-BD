@@ -1,16 +1,62 @@
 body {
     font-family: Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    background-color: #f0f0f0; /* Fundo claro para contraste */
+    color: #333;
+}
+
+.sidebar {
+    width: 220px;
+    height: 100vh;
+    background-color: #2e0e4d;
+    padding: 20px;
+    box-sizing: border-box;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+.sidebar h2 {
+    color: #bb86fc;
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin: 15px 0;
+}
+
+.sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+.sidebar ul li a:hover {
+    color: #bb86fc;
+}
+
+.main-content {
+    margin-left: 240px;
     padding: 30px;
-    background-color: #f4f4f4;
+    flex: 1;
 }
 
 h1, h2 {
-    color: #333;
+    color: #2e0e4d;
 }
 
 form {
     margin-bottom: 20px;
     background: #fff;
+    color: black;
     padding: 20px;
     border-radius: 6px;
     box-shadow: 0 0 5px #ccc;
@@ -38,6 +84,7 @@ table {
     background: #fff;
     border-collapse: collapse;
     box-shadow: 0 0 5px #ccc;
+    color: black;
 }
 
 th, td {
@@ -50,4 +97,27 @@ button {
     padding: 5px 10px;
     margin: 2px;
     cursor: pointer;
+}
+
+/* Emojis fixos nos links do menu com nomes de páginas atualizados */
+.sidebar ul li:nth-child(1) a::before {
+    content: "\1F3E0  "; /* 🏠 Home */
+}
+.sidebar ul li:nth-child(2) a::before {
+    content: "\1F464  "; /* 👤 Cliente */
+}
+.sidebar ul li:nth-child(3) a::before {
+    content: "\1F9D1\200D\1F4BC  "; /* 👨‍💼 Funcionário */
+}
+.sidebar ul li:nth-child(4) a::before {
+    content: "\1F4C4  "; /* 📄 OrcamentoContrato */
+}
+.sidebar ul li:nth-child(5) a::before {
+    content: "\1F3A8  "; /* 🎨 Tema */
+}
+.sidebar ul li:nth-child(6) a::before {
+    content: "\1F4B5  "; /* 💵 Pagamento */
+}
+.sidebar ul li:nth-child(7) a::before {
+    content: "\1F389  "; /* 🎉 Festa */
 }

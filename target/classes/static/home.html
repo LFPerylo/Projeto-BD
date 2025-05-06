@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Início</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="sidebar-container"></div>
+
+<div class="main-content">
+  <h1>Bem-vindo ao Sistema</h1>
+  <p>Use o menu lateral para navegar.</p>
+</div>
+
+<script>
+  fetch('sidebar.html')
+          .then(res => res.text())
+          .then(html => document.getElementById('sidebar-container').innerHTML = html);
+</script>
+</body>
+</html>
