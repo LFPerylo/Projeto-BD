@@ -31,7 +31,9 @@ public class FuncionarioDAO {
     // READ
     public List<Funcionario> listarTodos() throws SQLException {
         List<Funcionario> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Funcionario";
+        String sql = "SELECT f.*, s.Nome AS NomeSupervisor " +
+                "FROM Funcionario f " +
+                "LEFT JOIN Funcionario s ON f.Supervisor = s.Cod_Funcionario";
 
         try (Connection conn = ConexaoBD.conectar();
              Statement stmt = conn.createStatement();
@@ -43,6 +45,8 @@ public class FuncionarioDAO {
                 f.setNome(rs.getString("Nome"));
                 int sup = rs.getInt("Supervisor");
                 f.setSupervisor(rs.wasNull() ? null : sup);
+                f.setSupervisorNome(rs.getString("NomeSupervisor"));  // novo campo preenchido
+
                 lista.add(f);
             }
         }
@@ -51,7 +55,10 @@ public class FuncionarioDAO {
     }
 
     public Funcionario buscarPorId(int id) throws SQLException {
-        String sql = "SELECT * FROM Funcionario WHERE Cod_Funcionario = ?";
+        String sql = "SELECT f.*, s.Nome AS NomeSupervisor " +
+                "FROM Funcionario f " +
+                "LEFT JOIN Funcionario s ON f.Supervisor = s.Cod_Funcionario " +
+                "WHERE f.Cod_Funcionario = ?";
 
         try (Connection conn = ConexaoBD.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -65,6 +72,7 @@ public class FuncionarioDAO {
                 f.setNome(rs.getString("Nome"));
                 int sup = rs.getInt("Supervisor");
                 f.setSupervisor(rs.wasNull() ? null : sup);
+                f.setSupervisorNome(rs.getString("NomeSupervisor"));  // novo campo preenchido
                 return f;
             }
         }

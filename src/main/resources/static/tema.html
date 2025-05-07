@@ -1,0 +1,109 @@
+<!-- tema.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Tema</title>
+    <link rel="stylesheet" href="/style.css">
+    <script>
+        let temas = [];
+
+        async function listarTemas() {
+            const response = await fetch("/temas");
+            temas = await response.json();
+            const tbody = document.getElementById("temas-tbody");
+            tbody.innerHTML = "";
+
+            temas.forEach(tema => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+          <td>${tema.codTema}</td>
+          <td>${tema.nome}</td>
+          <td>${tema.descricao}</td>
+          <td></td>
+        `;
+                const botoesTd = tr.querySelector("td:last-child");
+
+                const editarBtn = document.createElement("button");
+                editarBtn.type = "button";
+                editarBtn.innerText = "Editar";
+                editarBtn.addEventListener("click", () => editarTema(tema.codTema));
+
+                const excluirBtn = document.createElement("button");
+                excluirBtn.type = "button";
+                excluirBtn.innerText = "Excluir";
+                excluirBtn.addEventListener("click", async () => {
+                    await fetch(`/temas/${tema.codTema}`, { method: "DELETE" });
+                    await listarTemas();
+                });
+
+                botoesTd.appendChild(editarBtn);
+                botoesTd.appendChild(excluirBtn);
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function salvarTema(event) {
+            event.preventDefault();
+            const tema = {
+                codTema: document.getElementById("codTema").value || null,
+                nome: document.getElementById("nome").value,
+                descricao: document.getElementById("descricao").value
+            };
+
+            const method = tema.codTema ? "PUT" : "POST";
+            const url = tema.codTema ? `/temas/${tema.codTema}` : "/temas";
+
+            await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(tema)
+            });
+
+            document.getElementById("form-tema").reset();
+            await listarTemas();
+        }
+
+        function editarTema(id) {
+            const tema = temas.find(t => t.codTema === id);
+            document.getElementById("codTema").value = tema.codTema;
+            document.getElementById("nome").value = tema.nome;
+            document.getElementById("descricao").value = tema.descricao;
+        }
+
+        window.onload = async () => {
+            await listarTemas();
+            fetch("/sidebar.html")
+                .then(res => res.text())
+                .then(html => document.getElementById("sidebar-container").innerHTML = html);
+        };
+    </script>
+</head>
+<body>
+<div id="sidebar-container"></div>
+
+<div class="main-content">
+    <h1>Cadastro de Tema</h1>
+    <form id="form-tema" onsubmit="salvarTema(event)">
+        <input type="hidden" id="codTema">
+        <input type="text" id="nome" placeholder="Nome do Tema" required>
+        <input type="text" id="descricao" placeholder="Descrição" required>
+        <button type="submit">Salvar</button>
+    </form>
+
+    <h2>Lista de Temas</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Descrição</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody id="temas-tbody">
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

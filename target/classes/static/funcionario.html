@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro de Funcionário</title>
+  <link rel="stylesheet" href="/style.css">
+  <script>
+    let funcionarios = [];
+
+    async function listarFuncionarios() {
+      const response = await fetch("/funcionarios");
+      funcionarios = await response.json();
+      const tbody = document.getElementById("funcionarios-tbody");
+      tbody.innerHTML = "";
+
+      funcionarios.forEach(funcionario => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${funcionario.codFuncionario}</td>
+          <td>${funcionario.nome}</td>
+          <td>${funcionario.supervisorNome || '-'}</td>
+          <td></td>
+        `;
+        const botoesTd = tr.querySelector("td:last-child");
+
+        const editarBtn = document.createElement("button");
+        editarBtn.type = "button";
+        editarBtn.innerText = "Editar";
+        editarBtn.addEventListener("click", () => editarFuncionario(funcionario.codFuncionario));
+
+        const excluirBtn = document.createElement("button");
+        excluirBtn.type = "button";
+        excluirBtn.innerText = "Excluir";
+        excluirBtn.addEventListener("click", async () => {
+          await fetch(`/funcionarios/${funcionario.codFuncionario}`, { method: "DELETE" });
+          await listarFuncionarios();
+          await preencherSupervisores();
+        });
+
+        botoesTd.appendChild(editarBtn);
+        botoesTd.appendChild(excluirBtn);
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function preencherSupervisores() {
+      const select = document.getElementById("supervisorId");
+      select.innerHTML = '<option value="">Sem Supervisor</option>';
+      funcionarios.forEach(func => {
+        const option = document.createElement("option");
+        option.value = func.codFuncionario;
+        option.textContent = `${func.codFuncionario} - ${func.nome}`;
+        select.appendChild(option);
+      });
+    }
+
+    async function salvarFuncionario(event) {
+      event.preventDefault();
+      const funcionario = {
+        codFuncionario: document.getElementById("codFuncionario").value || null,
+        nome: document.getElementById("nome").value,
+        supervisor: document.getElementById("supervisorId").value || null
+      };
+
+      const method = funcionario.codFuncionario ? "PUT" : "POST";
+      const url = funcionario.codFuncionario ? `/funcionarios/${funcionario.codFuncionario}` : "/funcionarios";
+
+      await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(funcionario)
+      });
+
+      document.getElementById("form-funcionario").reset();
+      await listarFuncionarios();
+      await preencherSupervisores();
+    }
+
+    function editarFuncionario(id) {
+      const funcionario = funcionarios.find(f => f.codFuncionario === id);
+      document.getElementById("codFuncionario").value = funcionario.codFuncionario;
+      document.getElementById("nome").value = funcionario.nome;
+      document.getElementById("supervisorId").value = funcionario.supervisor || "";
+    }
+
+    window.onload = async () => {
+      await listarFuncionarios();
+      await preencherSupervisores();
+      fetch("/sidebar.html")
+              .then(res => res.text())
+              .then(html => document.getElementById("sidebar-container").innerHTML = html);
+    };
+  </script>
+</head>
+<body>
+<div id="sidebar-container"></div>
+
+<div class="main-content">
+  <h1>Cadastro de Funcionário</h1>
+  <form id="form-funcionario" onsubmit="salvarFuncionario(event)">
+    <input type="hidden" id="codFuncionario">
+    <input type="text" id="nome" placeholder="Nome" required>
+    <select id="supervisorId">
+      <option value="">Sem Supervisor</option>
+    </select>
+    <button type="submit">Salvar</button>
+  </form>
+
+  <h2>Lista de Funcionários</h2>
+  <table>
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nome</th>
+      <th>Supervisor</th>
+      <th>Ações</th>
+    </tr>
+    </thead>
+    <tbody id="funcionarios-tbody">
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

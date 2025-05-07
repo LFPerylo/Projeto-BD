@@ -1,24 +1,17 @@
 package com.SpringBD.model;
 
 public class Funcionario {
-    private int codFuncionario;
+    private Integer codFuncionario;
     private String nome;
-    private Integer supervisor; // Representa o Cod_Funcionario do supervisor, pode ser null
+    private Integer supervisor;
+    private String supervisorNome;  // novo campo
 
-    public Funcionario() {
-    }
-
-    public Funcionario(int codFuncionario, String nome, Integer supervisor) {
-        this.codFuncionario = codFuncionario;
-        this.nome = nome;
-        this.supervisor = supervisor;
-    }
-
-    public int getCodFuncionario() {
+    // Getters e Setters
+    public Integer getCodFuncionario() {
         return codFuncionario;
     }
 
-    public void setCodFuncionario(int codFuncionario) {
+    public void setCodFuncionario(Integer codFuncionario) {
         this.codFuncionario = codFuncionario;
     }
 
@@ -36,5 +29,13 @@ public class Funcionario {
 
     public void setSupervisor(Integer supervisor) {
         this.supervisor = supervisor;
+    }
+
+    public String getSupervisorNome() {
+        return supervisorNome;
+    }
+
+    public void setSupervisorNome(String supervisorNome) {
+        this.supervisorNome = supervisorNome;
     }
 }
