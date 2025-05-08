@@ -86,4 +86,4 @@ src/main/java/com/SpringBD/SpringBdApplication.java
 Este projeto está licenciado sob os termos da [Licença MIT](LICENSE).
 ```
 
-URL DA ENTREGA 01: http://localhost:8080/cliente.html
+URL DA APLICAÇÃO:http://localhost:8080/home.html
