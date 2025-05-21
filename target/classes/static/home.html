@@ -16,6 +16,11 @@
     <h2>📊 Temas Mais Utilizados</h2>
     <canvas id="grafico-temas" width="600" height="300"></canvas>
   </section>
+
+  <section id="aniversariantes-proximos">
+    <h2>🎂 Aniversariantes nos Próximos 45 Dias</h2>
+    <canvas id="grafico-aniversariantes" width="600" height="300"></canvas>
+  </section>
 </div>
 
 <script>
@@ -69,7 +74,53 @@
     }
   }
 
-  window.onload = carregarGraficoTemas;
+  // Gráfico de aniversariantes (nome + código)
+  async function carregarGraficoAniversariantes() {
+    try {
+      const response = await fetch("/festas/aniversariantes/proximos");
+      if (!response.ok) throw new Error("Erro ao buscar aniversariantes");
+
+      const dados = await response.json();
+
+      const labels = dados.map(p => `${p.cod_aniversariante} - ${p.nome}`);
+      const diasRestantes = dados.map(p => p.dias_restantes);
+
+      new Chart(document.getElementById("grafico-aniversariantes"), {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Dias restantes para o aniversário',
+            data: diasRestantes,
+            backgroundColor: '#d08aa2'
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1,
+                precision: 0,
+                callback: function (value) {
+                  return Number.isInteger(value) ? value : null;
+                }
+              }
+            }
+          }
+        }
+      });
+    } catch (erro) {
+      console.error("Erro ao carregar gráfico de aniversariantes:", erro);
+    }
+  }
+
+  // Ao carregar a página
+  window.onload = () => {
+    carregarGraficoTemas();
+    carregarGraficoAniversariantes();
+  };
 </script>
 </body>
 </html>

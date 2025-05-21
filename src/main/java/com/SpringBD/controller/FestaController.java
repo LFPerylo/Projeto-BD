@@ -7,6 +7,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import com.SpringBD.config.ConexaoBD;
 
 @RestController
 @RequestMapping("/festas")
@@ -44,6 +49,31 @@ public class FestaController {
     @DeleteMapping("/{id}")
     public void deletar(@PathVariable int id) throws SQLException {
         service.deletar(id);
+    }
+
+    @GetMapping("/aniversariantes/proximos")
+    public List<Map<String, Object>> buscarAniversariantesProximos() throws SQLException {
+        String sql = """
+        SELECT cod_aniversariante, nome, data_nascimento, dias_restantes
+        FROM alerta_aniversario
+        ORDER BY dias_restantes ASC
+    """;
+
+        try (Connection conn = ConexaoBD.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            List<Map<String, Object>> lista = new ArrayList<>();
+            while (rs.next()) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("cod_aniversariante", rs.getInt("cod_aniversariante"));
+                item.put("nome", rs.getString("nome"));
+                item.put("data_nascimento", rs.getDate("data_nascimento").toString());
+                item.put("dias_restantes", rs.getInt("dias_restantes"));
+                lista.add(item);
+            }
+            return lista;
+        }
     }
 
     // Classe interna para receber a requisição correta (DTO)
