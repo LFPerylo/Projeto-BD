@@ -4,19 +4,72 @@
   <meta charset="UTF-8">
   <title>Início</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <div id="sidebar-container"></div>
 
 <div class="main-content">
-  <h1>Bem-vindo ao Sistema</h1>
-  <p>Use o menu lateral para navegar.</p>
+  <h1>Painel Administrativo</h1>
+
+  <section id="dashboard">
+    <h2>📊 Temas Mais Utilizados</h2>
+    <canvas id="grafico-temas" width="600" height="300"></canvas>
+  </section>
 </div>
 
 <script>
-  fetch('sidebar.html')
+  // Carregar a sidebar externa
+  fetch("/sidebar.html")
           .then(res => res.text())
-          .then(html => document.getElementById('sidebar-container').innerHTML = html);
+          .then(html => document.getElementById("sidebar-container").innerHTML = html);
+
+  // Carregar gráfico de temas
+  async function carregarGraficoTemas() {
+    try {
+      const response = await fetch("/temas/mais-usados");
+      if (!response.ok) throw new Error("Erro ao buscar dados do gráfico");
+
+      const dados = (await response.json())
+              .filter(d => d.quantidade > 0)
+              .sort((a, b) => b.quantidade - a.quantidade)
+              .slice(0, 5);
+
+      const nomes = dados.map(d => d.tema);
+      const quantidades = dados.map(d => d.quantidade);
+
+      new Chart(document.getElementById("grafico-temas"), {
+        type: 'bar',
+        data: {
+          labels: nomes,
+          datasets: [{
+            label: 'Temas mais utilizados',
+            data: quantidades,
+            backgroundColor: '#a267d0'
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1,
+                precision: 0,
+                callback: function(value) {
+                  return Number.isInteger(value) ? value : null;
+                }
+              }
+            }
+          }
+        }
+      });
+    } catch (erro) {
+      console.error("Erro ao carregar gráfico:", erro);
+    }
+  }
+
+  window.onload = carregarGraficoTemas;
 </script>
 </body>
 </html>

@@ -121,3 +121,22 @@ button {
 .sidebar ul li:nth-child(7) a::before {
     content: "\1F389  "; /* 🎉 Festa */
 }
+
+.logo-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sidebar-logo {
+    width: 140px;
+    height: auto;
+    background-color: white; /* realça a logo em fundo roxo */
+    padding: 8px;
+    border-radius: 16px;
+    box-shadow: 0 0 10px #00000033;
+}
+
+#grafico-temas {
+    max-width: 80%;
+    max-height: 400px;
+}
