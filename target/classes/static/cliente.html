@@ -45,6 +45,7 @@
         async function salvarCliente(event) {
             event.preventDefault();
             const tipo = document.querySelector('input[name="tipoCliente"]:checked').value;
+
             const cliente = {
                 codCliente: document.getElementById("codCliente").value || null,
                 nome: document.getElementById("nome").value,
@@ -55,6 +56,11 @@
                 cidade: document.getElementById("cidade").value,
                 estado: document.getElementById("estado").value,
             };
+
+            const telefones = document.getElementById("telefones").value
+                .split(",")
+                .map(t => t.trim())
+                .filter(t => t !== "");
 
             if (tipo === "pf") {
                 cliente.cpf = document.getElementById("cpf").value;
@@ -74,7 +80,28 @@
                 body: JSON.stringify(cliente)
             });
 
+            await new Promise(resolve => setTimeout(resolve, 500)); // espera o cliente ser salvo
+
+            const clientesAtuais = await fetch("/clientes").then(r => r.json());
+            const clienteInserido = clientesAtuais.find(c =>
+                c.nome === cliente.nome && c.email === cliente.email
+            );
+
+            if (clienteInserido && clienteInserido.codCliente && telefones.length > 0) {
+                for (const telefone of telefones) {
+                    await fetch("/telefones", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            codCliente: clienteInserido.codCliente,
+                            telefone: telefone
+                        })
+                    });
+                }
+            }
+
             document.getElementById("form-cliente").reset();
+            atualizarCamposTipo();
             listarClientes();
         }
 
@@ -93,6 +120,7 @@
             document.getElementById("bairro").value = cliente.bairro;
             document.getElementById("cidade").value = cliente.cidade;
             document.getElementById("estado").value = cliente.estado;
+            document.getElementById("telefones").value = (cliente.telefones || []).join(", ");
 
             if (cliente.cpf) {
                 document.querySelector('input[value="pf"]').checked = true;
@@ -120,7 +148,6 @@
                 r.addEventListener("change", atualizarCamposTipo);
             });
 
-            // Carregar sidebar externa
             fetch("/sidebar.html")
                 .then(res => res.text())
                 .then(html => document.getElementById("sidebar-container").innerHTML = html);
@@ -144,6 +171,7 @@
         <input type="text" id="bairro" placeholder="Bairro">
         <input type="text" id="cidade" placeholder="Cidade">
         <input type="text" id="estado" placeholder="Estado">
+        <input type="text" id="telefones" placeholder="Telefones (separados por vírgula)">
 
         <div id="camposPF">
             <input type="text" id="cpf" placeholder="CPF">
@@ -171,7 +199,6 @@
         </tr>
         </thead>
         <tbody id="clientes-tbody">
-        <!-- preenchido via JS -->
         </tbody>
     </table>
 </div>
