@@ -1,12 +1,18 @@
 // PagamentoController.java
 package com.SpringBD.controller;
 
+import com.SpringBD.config.ConexaoBD;
 import com.SpringBD.model.Pagamento;
 import com.SpringBD.service.PagamentoService;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.sql.Connection;
+import java.util.Map;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 @RestController
 @RequestMapping("/pagamentos")
@@ -40,4 +46,11 @@ public class PagamentoController {
     public void deletar(@PathVariable int id) throws SQLException {
         service.deletar(id);
     }
+
+    @GetMapping("/resumo-financeiro/{numContrato}")
+    public Map<String, Object> getResumo(@PathVariable int numContrato) throws SQLException {
+        return service.resumoFinanceiroCompleto(numContrato);
+    }
+
+
 }

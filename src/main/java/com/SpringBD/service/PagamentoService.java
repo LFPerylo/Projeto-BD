@@ -6,6 +6,7 @@ import com.SpringBD.model.Pagamento;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public class PagamentoService {
 
@@ -29,5 +30,9 @@ public class PagamentoService {
 
     public void deletar(int codPagamento) throws SQLException {
         dao.deletar(codPagamento);
+    }
+
+    public Map<String, Object> resumoFinanceiroCompleto(int contrato) throws SQLException {
+        return dao.resumoFinanceiroCompleto(contrato);
     }
 }

@@ -5,21 +5,44 @@
   <title>Início</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 <body>
 <div id="sidebar-container"></div>
 
 <div class="main-content">
-  <h1>Painel Administrativo</h1>
+  <h1>DashBords</h1>
 
   <section id="dashboard">
-    <h2>📊 Temas Mais Utilizados</h2>
+    <h2> Temas Mais Utilizados</h2>
     <canvas id="grafico-temas" width="600" height="300"></canvas>
   </section>
 
   <section id="aniversariantes-proximos">
-    <h2>🎂 Aniversariantes nos Próximos 45 Dias</h2>
+    <h2> Aniversariantes nos Próximos 45 Dias</h2>
     <canvas id="grafico-aniversariantes" width="600" height="300"></canvas>
+  </section>
+
+  <section id="resumo-financeiro">
+    <h2>📋 Resumo Financeiro do Contrato</h2>
+
+    <div class="resumo-card">
+      <div class="resumo-input">
+        <input type="number" id="contrato-numero" placeholder="Número do Contrato">
+        <button onclick="carregarResumoContrato()">Ver Resumo</button>
+      </div>
+
+      <div id="resumo-result" class="resumo-detalhes" style="display: none;">
+        <p><strong>Valor Inicial:</strong> R$ <span id="valor-inicial"></span></p>
+        <p><strong>Valor do Sinal:</strong> R$ <span id="valor-sinal"></span></p>
+        <p><strong>Valor Acrescentado:</strong> R$ <span id="valor-extra"></span></p>
+        <p><strong>Valor Final:</strong> R$ <span id="valor-final"></span></p>
+      </div>
+
+      <div id="resumo-erro" class="erro-mensagem" style="display: none;">
+        <p>❌ Resumo não encontrado.</p>
+      </div>
+    </div>
   </section>
 
 
@@ -121,6 +144,35 @@
       console.error("Erro ao carregar gráfico de aniversariantes:", erro);
     }
   }
+
+  async function carregarResumoContrato() {
+    const contrato = document.getElementById("contrato-numero").value;
+    if (!contrato) return alert("Informe o número do contrato.");
+
+    try {
+      const response = await fetch(`/pagamentos/resumo-financeiro/${contrato}`);
+      if (!response.ok) throw new Error("Resumo não encontrado.");
+
+      const resumo = await response.json();
+
+      document.getElementById("valor-inicial").innerText = `R$ ${resumo.valor_inicial.toFixed(2)}`;
+      document.getElementById("valor-sinal").innerText = `R$ ${resumo.valor_sinal.toFixed(2)}`;
+      document.getElementById("valor-extra").innerText = `R$ ${resumo.valor_extra.toFixed(2)}`;
+      document.getElementById("valor-final").innerText =
+              resumo.valor_final !== null
+                      ? `R$ ${resumo.valor_final.toFixed(2)}`
+                      : "Ainda não foi pago";
+
+      document.getElementById("resumo-result").style.display = "block";
+      document.getElementById("resumo-erro").style.display = "none";
+    } catch (erro) {
+      console.error("Erro ao carregar resumo:", erro);
+      document.getElementById("resumo-result").style.display = "none";
+      document.getElementById("resumo-erro").style.display = "block";
+    }
+  }
+
+
 
   // Ao carregar a página
   window.onload = () => {

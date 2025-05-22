@@ -7,7 +7,9 @@ import com.SpringBD.model.Pagamento;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PagamentoDAO {
 
@@ -103,4 +105,28 @@ public class PagamentoDAO {
             stmt.executeUpdate();
         }
     }
+
+    public Map<String, Object> resumoFinanceiroCompleto(int contrato) throws SQLException {
+        String sql = "{CALL resumo_financeiro_completo(?)}";
+
+        try (Connection conn = ConexaoBD.conectar();
+             CallableStatement stmt = conn.prepareCall(sql)) {
+
+            stmt.setInt(1, contrato);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Map<String, Object> mapa = new HashMap<>();
+                mapa.put("valor_inicial", rs.getDouble("valor_inicial"));
+                mapa.put("valor_sinal", rs.getDouble("valor_sinal"));
+                mapa.put("valor_extra", rs.getDouble("valor_extra"));
+                mapa.put("valor_final", rs.getObject("valor_final")); // pode ser null
+                return mapa;
+            } else {
+                throw new SQLException("Contrato não encontrado.");
+            }
+        }
+    }
+
+
 }
