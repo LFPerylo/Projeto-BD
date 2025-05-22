@@ -8,6 +8,7 @@
     let festas = [];
     let contratos = [];
     let temas = [];
+    let aniversariantes = [];
 
     async function carregarDropdowns() {
       contratos = await fetch("/orcamentos").then(r => r.json());
@@ -42,7 +43,7 @@
       tbody.innerHTML = "";
 
       festas.forEach(f => {
-        const contrato = contratos.find(c => parseInt(c.numContrato) === f.numContrato);
+        const contrato = contratos.find(c => c.numContrato == f.numContrato);
         const tema = temas.find(t => t.codTema === f.codTema);
 
         const tr = document.createElement("tr");
@@ -76,14 +77,23 @@
     async function salvarFesta(event) {
       event.preventDefault();
 
+      // Se campos de aniversariante foram preenchidos, adiciona
+      const nome = document.getElementById("nomeAniversariante").value;
+      const idade = parseInt(document.getElementById("idadeAniversariante").value);
+      const dataNascimento = document.getElementById("dataNascimentoAniversariante").value;
+
+      if (nome && idade && dataNascimento) {
+        aniversariantes.push({ nome, idade, dataNascimento });
+      }
+
       const festaPayload = {
         festa: {
           codFesta: document.getElementById("codFesta").value || null,
-          numContrato: parseInt(document.getElementById("numContrato").value),
+          numContrato: document.getElementById("numContrato").value,
           codTema: parseInt(document.getElementById("codTema").value),
           horarioFim: document.getElementById("horarioFim").value
         },
-        aniversariantes: [], // Vazio por enquanto
+        aniversariantes: aniversariantes,
         ano: new Date().getFullYear()
       };
 
@@ -99,6 +109,7 @@
       });
 
       document.getElementById("form-festa").reset();
+      aniversariantes = [];
       listarFestas();
     }
 
@@ -137,7 +148,12 @@
     <label>Horário de Fim:</label>
     <input type="time" id="horarioFim" required>
 
-    <button type="submit">Salvar</button>
+    <h3>Aniversariante (opcional)</h3>
+    <input type="text" id="nomeAniversariante" placeholder="Nome">
+    <input type="number" id="idadeAniversariante" placeholder="Idade">
+    <input type="date" id="dataNascimentoAniversariante">
+
+    <button type="submit">Salvar Festa</button>
   </form>
 
   <h2>Lista de Festas</h2>
