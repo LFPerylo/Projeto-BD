@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Orçamento</title>
+    <link rel="stylesheet" href="/style.css">
+    <script>
+        let orcamentos = [];
+        let clientes = [];
+        let funcionarios = [];
+        let temas = [];
+
+        async function carregarDropdowns() {
+            clientes = await fetch("/clientes").then(r => r.json());
+            funcionarios = await fetch("/funcionarios").then(r => r.json());
+            temas = await fetch("/temas").then(r => r.json());
+
+            const clienteSelect = document.getElementById("codCliente");
+            const funcionarioSelect = document.getElementById("codFuncionario");
+            const temaSelect = document.getElementById("codTema");
+
+            clienteSelect.innerHTML = "<option value=''>Selecione</option>";
+            funcionarioSelect.innerHTML = "<option value=''>Selecione</option>";
+            temaSelect.innerHTML = "<option value=''>Selecione</option>";
+
+            clientes.forEach(c => {
+                const opt = document.createElement("option");
+                opt.value = c.codCliente;
+                opt.textContent = c.nome;
+                clienteSelect.appendChild(opt);
+            });
+
+            funcionarios.forEach(f => {
+                const opt = document.createElement("option");
+                opt.value = f.codFuncionario;
+                opt.textContent = f.nome;
+                funcionarioSelect.appendChild(opt);
+            });
+
+            temas.forEach(t => {
+                const opt = document.createElement("option");
+                opt.value = t.codTema;
+                opt.textContent = t.nome;
+                temaSelect.appendChild(opt);
+            });
+        }
+
+        async function listarOrcamentos() {
+            const response = await fetch("/orcamentos");
+            orcamentos = await response.json();
+            const tbody = document.getElementById("orcamentos-tbody");
+            tbody.innerHTML = "";
+
+            orcamentos.forEach(o => {
+                const clienteNome = clientes.find(c => c.codCliente === o.codCliente)?.nome || "-";
+                const funcionarioNome = funcionarios.find(f => f.codFuncionario === o.codFuncionario)?.nome || "-";
+                const temaNome = temas.find(t => t.codTema === o.codTema)?.nome || "-";
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+          <td>${o.codOrcamento}</td>
+          <td>${clienteNome}</td>
+          <td>${funcionarioNome}</td>
+          <td>R$ ${o.valorInicial.toFixed(2)}</td>
+          <td>${temaNome}</td>
+          <td>${o.localFesta}</td>
+          <td></td>
+        `;
+
+                const botoesTd = tr.querySelector("td:last-child");
+
+                const editarBtn = document.createElement("button");
+                editarBtn.textContent = "Editar";
+                editarBtn.onclick = () => editarOrcamento(o.codOrcamento);
+
+                const excluirBtn = document.createElement("button");
+                excluirBtn.textContent = "Excluir";
+                excluirBtn.onclick = async () => {
+                    await fetch(`/orcamentos/${o.codOrcamento}`, { method: "DELETE" });
+                    listarOrcamentos();
+                };
+
+                botoesTd.appendChild(editarBtn);
+                botoesTd.appendChild(excluirBtn);
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function salvarOrcamento(event) {
+            event.preventDefault();
+
+            const orcamento = {
+                codOrcamento: document.getElementById("codOrcamento").value || null,
+                numContrato: document.getElementById("numContrato").value || null,
+                codCliente: parseInt(document.getElementById("codCliente").value),
+                codFuncionario: parseInt(document.getElementById("codFuncionario").value),
+                codTema: parseInt(document.getElementById("codTema").value),
+                dataFesta: document.getElementById("dataFesta").value,
+                horarioFesta: document.getElementById("horarioFesta").value,
+                valorInicial: parseFloat(document.getElementById("valorInicial").value),
+                localFesta: document.getElementById("localFesta").value,
+                diaSemana: document.getElementById("diaSemana").value,
+                dataAssinatura: document.getElementById("dataAssinatura").value || null,
+                valorSinal: parseFloat(document.getElementById("valorSinal").value) || 0
+            };
+
+            const method = orcamento.codOrcamento ? "PUT" : "POST";
+            const url = orcamento.codOrcamento ? `/orcamentos/${orcamento.codOrcamento}` : "/orcamentos";
+
+            await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(orcamento)
+            });
+
+            document.getElementById("form-orcamento").reset();
+            listarOrcamentos();
+        }
+
+        function editarOrcamento(id) {
+            const o = orcamentos.find(x => x.codOrcamento === id);
+            document.getElementById("codOrcamento").value = o.codOrcamento;
+            document.getElementById("numContrato").value = o.numContrato || "";
+            document.getElementById("codCliente").value = o.codCliente;
+            document.getElementById("codFuncionario").value = o.codFuncionario;
+            document.getElementById("codTema").value = o.codTema;
+            document.getElementById("dataFesta").value = o.dataFesta;
+            document.getElementById("horarioFesta").value = o.horarioFesta;
+            document.getElementById("valorInicial").value = o.valorInicial;
+            document.getElementById("localFesta").value = o.localFesta;
+            document.getElementById("diaSemana").value = o.diaSemana;
+            document.getElementById("dataAssinatura").value = o.dataAssinatura || "";
+            document.getElementById("valorSinal").value = o.valorSinal || "";
+        }
+
+        window.onload = async () => {
+            await carregarDropdowns();
+            await listarOrcamentos();
+
+            fetch("/sidebar.html")
+                .then(res => res.text())
+                .then(html => document.getElementById("sidebar-container").innerHTML = html);
+        };
+    </script>
+</head>
+<body>
+<div id="sidebar-container"></div>
+
+<div class="main-content">
+    <h1>Cadastro de Orçamento / Contrato</h1>
+
+    <form id="form-orcamento" onsubmit="salvarOrcamento(event)">
+        <input type="hidden" id="codOrcamento">
+
+        <label>Contrato Nº:</label>
+        <input type="text" id="numContrato">
+
+        <label>Cliente:</label>
+        <select id="codCliente" required></select>
+
+        <label>Funcionário:</label>
+        <select id="codFuncionario" required></select>
+
+        <label>Tema:</label>
+        <select id="codTema" required></select>
+
+        <label>Data da Festa:</label>
+        <input type="date" id="dataFesta" required>
+
+        <label>Horário da Festa:</label>
+        <input type="time" id="horarioFesta" required>
+
+        <label>Valor Inicial:</label>
+        <input type="number" id="valorInicial" step="0.01" required>
+
+        <label>Local da Festa:</label>
+        <input type="text" id="localFesta">
+
+        <label>Dia da Semana:</label>
+        <input type="text" id="diaSemana">
+
+        <label>Data da Assinatura:</label>
+        <input type="date" id="dataAssinatura">
+
+        <label>Valor do Sinal:</label>
+        <input type="number" id="valorSinal" step="0.01">
+
+        <button type="submit">Salvar</button>
+    </form>
+
+    <h2>Lista de Orçamentos</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Código</th>
+            <th>Cliente</th>
+            <th>Funcionário</th>
+            <th>Valor</th>
+            <th>Tema</th>
+            <th>Local</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody id="orcamentos-tbody"></tbody>
+    </table>
+</div>
+</body>
+</html>

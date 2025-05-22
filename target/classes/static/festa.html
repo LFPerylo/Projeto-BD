@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro de Festa</title>
+  <link rel="stylesheet" href="/style.css">
+  <script>
+    let festas = [];
+    let contratos = [];
+    let temas = [];
+
+    async function carregarDropdowns() {
+      contratos = await fetch("/orcamentos").then(r => r.json());
+      temas = await fetch("/temas").then(r => r.json());
+
+      const contratoSelect = document.getElementById("numContrato");
+      const temaSelect = document.getElementById("codTema");
+
+      contratoSelect.innerHTML = "<option value=''>Selecione</option>";
+      temaSelect.innerHTML = "<option value=''>Selecione</option>";
+
+      contratos.forEach(c => {
+        if (c.numContrato) {
+          const opt = document.createElement("option");
+          opt.value = c.numContrato;
+          opt.textContent = `Contrato Nº ${c.numContrato}`;
+          contratoSelect.appendChild(opt);
+        }
+      });
+
+      temas.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t.codTema;
+        opt.textContent = t.nome;
+        temaSelect.appendChild(opt);
+      });
+    }
+
+    async function listarFestas() {
+      festas = await fetch("/festas").then(r => r.json());
+      const tbody = document.getElementById("festas-tbody");
+      tbody.innerHTML = "";
+
+      festas.forEach(f => {
+        const contrato = contratos.find(c => parseInt(c.numContrato) === f.numContrato);
+        const tema = temas.find(t => t.codTema === f.codTema);
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${f.codFesta}</td>
+          <td>${contrato ? contrato.numContrato : '-'}</td>
+          <td>${tema ? tema.nome : '-'}</td>
+          <td>${f.horarioFim}</td>
+          <td></td>
+        `;
+
+        const botoesTd = tr.querySelector("td:last-child");
+
+        const editarBtn = document.createElement("button");
+        editarBtn.innerText = "Editar";
+        editarBtn.onclick = () => editarFesta(f.codFesta);
+
+        const excluirBtn = document.createElement("button");
+        excluirBtn.innerText = "Excluir";
+        excluirBtn.onclick = async () => {
+          await fetch(`/festas/${f.codFesta}`, { method: "DELETE" });
+          listarFestas();
+        };
+
+        botoesTd.appendChild(editarBtn);
+        botoesTd.appendChild(excluirBtn);
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function salvarFesta(event) {
+      event.preventDefault();
+
+      const festaPayload = {
+        festa: {
+          codFesta: document.getElementById("codFesta").value || null,
+          numContrato: parseInt(document.getElementById("numContrato").value),
+          codTema: parseInt(document.getElementById("codTema").value),
+          horarioFim: document.getElementById("horarioFim").value
+        },
+        aniversariantes: [], // Vazio por enquanto
+        ano: new Date().getFullYear()
+      };
+
+      const method = festaPayload.festa.codFesta ? "PUT" : "POST";
+      const url = festaPayload.festa.codFesta
+              ? `/festas/${festaPayload.festa.codFesta}`
+              : "/festas";
+
+      await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(festaPayload)
+      });
+
+      document.getElementById("form-festa").reset();
+      listarFestas();
+    }
+
+    function editarFesta(id) {
+      const f = festas.find(f => f.codFesta === id);
+      document.getElementById("codFesta").value = f.codFesta;
+      document.getElementById("numContrato").value = f.numContrato;
+      document.getElementById("codTema").value = f.codTema;
+      document.getElementById("horarioFim").value = f.horarioFim;
+    }
+
+    window.onload = async () => {
+      await carregarDropdowns();
+      await listarFestas();
+
+      fetch("/sidebar.html")
+              .then(res => res.text())
+              .then(html => document.getElementById("sidebar-container").innerHTML = html);
+    };
+  </script>
+</head>
+<body>
+<div id="sidebar-container"></div>
+
+<div class="main-content">
+  <h1>Cadastro de Festa</h1>
+  <form id="form-festa" onsubmit="salvarFesta(event)">
+    <input type="hidden" id="codFesta">
+
+    <label>Contrato:</label>
+    <select id="numContrato" required></select>
+
+    <label>Tema:</label>
+    <select id="codTema" required></select>
+
+    <label>Horário de Fim:</label>
+    <input type="time" id="horarioFim" required>
+
+    <button type="submit">Salvar</button>
+  </form>
+
+  <h2>Lista de Festas</h2>
+  <table>
+    <thead>
+    <tr>
+      <th>Código</th>
+      <th>Contrato</th>
+      <th>Tema</th>
+      <th>Horário Fim</th>
+      <th>Ações</th>
+    </tr>
+    </thead>
+    <tbody id="festas-tbody"></tbody>
+  </table>
+</div>
+</body>
+</html>
