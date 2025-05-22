@@ -4,38 +4,7 @@
   <meta charset="UTF-8">
   <title>Login / Cadastro</title>
   <link rel="stylesheet" href="/style.css">
-  <style>
-    .login-container {
-      max-width: 400px;
-      margin: 100px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px #ccc;
-    }
-    .login-container h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #2e0e4d;
-    }
-    .login-container input, .login-container button {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      font-size: 14px;
-    }
-    .toggle {
-      text-align: center;
-      margin-top: 10px;
-      cursor: pointer;
-      color: #4CAF50;
-    }
-    .erro {
-      color: red;
-      text-align: center;
-      margin-top: 10px;
-    }
-  </style>
+
   <script>
     async function loginFuncionario(event) {
       event.preventDefault();
@@ -107,7 +76,10 @@
   </script>
 </head>
 <body>
+
 <div class="login-container">
+  <img src="/logo.png" alt="Logo Perylampo" style="height: 80px; margin-bottom: 20px;">
+
   <div id="loginForm">
     <h2>Login</h2>
     <form onsubmit="loginFuncionario(event)">

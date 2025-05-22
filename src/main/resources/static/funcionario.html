@@ -43,6 +43,17 @@
       });
     }
 
+    function filtrarFuncionarios() {
+      const filtro = document.getElementById("filtroFuncionario").value.toLowerCase();
+      const linhas = document.querySelectorAll("#funcionarios-tbody tr");
+
+      linhas.forEach(linha => {
+        const nome = linha.children[1].textContent.toLowerCase();
+        linha.style.display = nome.includes(filtro) ? "" : "none";
+      });
+    }
+
+
     async function preencherSupervisores() {
       const select = document.getElementById("supervisorId");
       select.innerHTML = '<option value="">Sem Supervisor</option>';
@@ -107,6 +118,9 @@
   </form>
 
   <h2>Lista de Funcionários</h2>
+
+  <input type="text" id="filtroFuncionario" placeholder="🔍 Buscar por nome..." oninput="filtrarFuncionarios()" class="barra-pesquisa">
+
   <table>
     <thead>
     <tr>

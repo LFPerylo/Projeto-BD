@@ -42,6 +42,16 @@
             });
         }
 
+        function filtrarClientes() {
+            const filtro = document.getElementById("filtroCliente").value.toLowerCase();
+            const linhas = document.querySelectorAll("#clientes-tbody tr");
+
+            linhas.forEach(linha => {
+                const nome = linha.children[1].textContent.toLowerCase();
+                linha.style.display = nome.includes(filtro) ? "" : "none";
+            });
+        }
+
         async function salvarCliente(event) {
             event.preventDefault();
             const tipo = document.querySelector('input[name="tipoCliente"]:checked').value;
@@ -188,6 +198,9 @@
     </form>
 
     <h2>Lista de Clientes</h2>
+
+    <input type="text" id="filtroCliente" placeholder="🔍 Buscar por nome..." oninput="filtrarClientes()" class="barra-pesquisa">
+
     <table>
         <thead>
         <tr>

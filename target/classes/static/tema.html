@@ -43,6 +43,17 @@
             });
         }
 
+        function filtrarTemas() {
+            const filtro = document.getElementById("filtroTema").value.toLowerCase();
+            const linhas = document.querySelectorAll("#temas-tbody tr");
+
+            linhas.forEach(linha => {
+                const nome = linha.children[1].textContent.toLowerCase(); // index 1 = Nome do Tema
+                linha.style.display = nome.includes(filtro) ? "" : "none";
+            });
+        }
+
+
         async function salvarTema(event) {
             event.preventDefault();
             const tema = {
@@ -92,6 +103,9 @@
     </form>
 
     <h2>Lista de Temas</h2>
+
+    <input type="text" id="filtroTema" placeholder="🔍 Buscar por nome do tema..." oninput="filtrarTemas()" class="barra-pesquisa">
+
     <table>
         <thead>
         <tr>

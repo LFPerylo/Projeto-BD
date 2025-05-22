@@ -21,6 +21,8 @@
     <h2>🎂 Aniversariantes nos Próximos 45 Dias</h2>
     <canvas id="grafico-aniversariantes" width="600" height="300"></canvas>
   </section>
+
+
 </div>
 
 <script>
@@ -28,6 +30,10 @@
   fetch("/sidebar.html")
           .then(res => res.text())
           .then(html => document.getElementById("sidebar-container").innerHTML = html);
+
+  fetch("/footer.html")
+          .then(res => res.text())
+          .then(html => document.getElementById("footer-container").innerHTML = html);
 
   // Carregar gráfico de temas
   async function carregarGraficoTemas() {
@@ -122,5 +128,7 @@
     carregarGraficoAniversariantes();
   };
 </script>
+
+
 </body>
 </html>
