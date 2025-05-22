@@ -95,4 +95,32 @@ public class AniversarianteDAO {
             stmt.executeUpdate();
         }
     }
+
+    public List<Aniversariante> buscarPorCodFesta(int codFesta) throws SQLException {
+        List<Aniversariante> lista = new ArrayList<>();
+        String sql = """
+        SELECT a.*
+        FROM contem c
+        JOIN aniversariante a ON c.cod_aniversariante = a.cod_aniversariante
+        WHERE c.cod_festa = ?
+    """;
+
+        try (Connection conn = ConexaoBD.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, codFesta);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Aniversariante a = new Aniversariante();
+                a.setCodAniversariante(rs.getInt("cod_aniversariante"));
+                a.setNome(rs.getString("nome"));
+                a.setIdade(rs.getInt("idade"));
+                a.setDataNascimento(rs.getDate("data_nascimento").toLocalDate());
+                lista.add(a);
+            }
+        }
+
+        return lista;
+    }
+
 }

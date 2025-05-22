@@ -1,5 +1,6 @@
 package com.SpringBD.controller;
 
+import com.SpringBD.dao.AniversarianteDAO;
 import com.SpringBD.model.Aniversariante;
 import com.SpringBD.model.Festa;
 import com.SpringBD.service.FestaService;
@@ -74,6 +75,11 @@ public class FestaController {
             }
             return lista;
         }
+    }
+
+    @GetMapping("/{id}/aniversariantes")
+    public List<Aniversariante> listarAniversariantesDaFesta(@PathVariable int id) throws SQLException {
+        return new AniversarianteDAO().buscarPorCodFesta(id);
     }
 
     // Classe interna para receber a requisição correta (DTO)

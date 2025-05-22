@@ -74,6 +74,25 @@
       });
     }
 
+    async function filtrarFestas() {
+      const filtro = document.getElementById("filtroFesta").value.toLowerCase();
+      const linhas = document.querySelectorAll("#festas-tbody tr");
+
+      for (const linha of linhas) {
+        const codFesta = linha.children[0].textContent.toLowerCase();
+
+        // Buscar aniversariantes dessa festa
+        const idFesta = linha.children[0].textContent;
+        const response = await fetch(`/festas/${idFesta}/aniversariantes`);
+        const listaAniversariantes = await response.json();
+        const codigosAniversariantes = listaAniversariantes.map(a => a.codAniversariante.toString());
+
+        const corresponde = codFesta.includes(filtro) || codigosAniversariantes.some(c => c.includes(filtro));
+        linha.style.display = corresponde ? "" : "none";
+      }
+    }
+
+
     async function salvarFesta(event) {
       event.preventDefault();
 
@@ -157,6 +176,9 @@
   </form>
 
   <h2>Lista de Festas</h2>
+
+  <input type="text" id="filtroFesta" placeholder="🔍 Buscar por código da festa ou aniversariante..." oninput="filtrarFestas()" class="barra-pesquisa">
+
   <table>
     <thead>
     <tr>
