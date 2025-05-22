@@ -6,6 +6,7 @@ import com.SpringBD.model.OrcamentoContrato;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public class OrcamentoContratoService {
     private final OrcamentoContratoDAO dao = new OrcamentoContratoDAO();
@@ -29,4 +30,10 @@ public class OrcamentoContratoService {
     public void deletar(int codOrcamento, int numContrato) throws SQLException {
         dao.deletar(codOrcamento, numContrato);
     }
+
+    public List<Map<String, Object>> buscarFestasPorMes(int ano) throws SQLException {
+        return dao.buscarFestasPorMes(ano);
+    }
+
+
 }

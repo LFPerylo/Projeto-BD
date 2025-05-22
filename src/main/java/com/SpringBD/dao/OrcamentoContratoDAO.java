@@ -7,7 +7,9 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class OrcamentoContratoDAO {
 
@@ -130,4 +132,29 @@ public class OrcamentoContratoDAO {
             stmt.executeUpdate();
         }
     }
+
+    public List<Map<String, Object>> buscarFestasPorMes(int ano) throws SQLException {
+        String sql = "CALL festas_por_mes(?)";
+
+        try (Connection conn = ConexaoBD.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, ano);
+            ResultSet rs = stmt.executeQuery();
+
+            List<Map<String, Object>> resultado = new ArrayList<>();
+            while (rs.next()) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("mes", rs.getInt("mes"));
+                item.put("quantidade", rs.getInt("quantidade"));
+                resultado.add(item);
+            }
+            return resultado;
+        }
+    }
+
+
+
+
+
 }

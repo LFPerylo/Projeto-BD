@@ -11,7 +11,7 @@
 <div id="sidebar-container"></div>
 
 <div class="main-content">
-  <h1>DashBords</h1>
+  <h1>DashBoards</h1>
 
   <section id="dashboard">
     <h2> Temas Mais Utilizados</h2>
@@ -43,6 +43,17 @@
         <p>❌ Resumo não encontrado.</p>
       </div>
     </div>
+  </section>
+
+  <section id="dashboard-festas">
+    <h2>📅 Festas por Mês</h2>
+
+    <div class="filtro-dashboard">
+      <input type="number" id="input-ano" placeholder="Ano (ex: 2025)">
+      <button onclick="carregarGraficoFestasPorMes()">Ver Gráfico</button>
+    </div>
+
+    <canvas id="grafico-festas" width="600" height="300"></canvas>
   </section>
 
 
@@ -172,12 +183,59 @@
     }
   }
 
+  async function carregarGraficoFestasPorMes() {
+    const anoInput = document.getElementById("input-ano").value;
+    const ano = anoInput ? parseInt(anoInput) : new Date().getFullYear();
+
+    try {
+      const response = await fetch(`/orcamentos/por-mes/${ano}`);
+      if (!response.ok) throw new Error("Erro na requisição");
+
+      const dados = await response.json();
+      if (!Array.isArray(dados)) throw new Error("Resposta inválida");
+
+      const labels = dados.map(d => `Mês ${d.mes}`);
+      const valores = dados.map(d => d.quantidade);
+
+      const graficoAnterior = Chart.getChart("grafico-festas");
+      if (graficoAnterior) graficoAnterior.destroy();
+
+      new Chart(document.getElementById("grafico-festas"), {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: `Festas no ano ${ano}`,
+            data: valores,
+            backgroundColor: '#7e57c2'
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1,
+                precision: 0
+              }
+            }
+          }
+        }
+      });
+    } catch (error) {
+      console.error("Erro ao carregar gráfico:", error);
+      alert("Erro ao carregar festas. Verifique se o ano é válido ou se o servidor está rodando.");
+    }
+  }
+
 
 
   // Ao carregar a página
   window.onload = () => {
     carregarGraficoTemas();
     carregarGraficoAniversariantes();
+    carregarGraficoFestasPorMes();
   };
 </script>
 

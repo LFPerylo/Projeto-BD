@@ -9,6 +9,7 @@ import com.SpringBD.model.Festa;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public class FestaService {
     private final FestaDAO festaDAO = new FestaDAO();

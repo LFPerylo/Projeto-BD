@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/orcamentos")
@@ -43,4 +44,10 @@ public class OrcamentoContratoController {
     public void deletar(@PathVariable int codOrcamento, @PathVariable int numContrato) throws SQLException {
         service.deletar(codOrcamento, numContrato);
     }
+
+    @GetMapping("/por-mes/{ano}")
+    public List<Map<String, Object>> festasPorMes(@PathVariable int ano) throws SQLException {
+        return service.buscarFestasPorMes(ano);
+    }
+
 }
