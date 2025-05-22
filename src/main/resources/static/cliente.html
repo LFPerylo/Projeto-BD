@@ -47,10 +47,16 @@
             const linhas = document.querySelectorAll("#clientes-tbody tr");
 
             linhas.forEach(linha => {
-                const nome = linha.children[1].textContent.toLowerCase();
-                linha.style.display = nome.includes(filtro) ? "" : "none";
+                const codCliente = linha.children[0].textContent.toLowerCase(); // Código na primeira coluna
+                const nome = linha.children[1].textContent.toLowerCase();       // Nome na segunda coluna
+
+                linha.style.display =
+                    codCliente.includes(filtro) || nome.includes(filtro)
+                        ? ""
+                        : "none";
             });
         }
+
 
         async function salvarCliente(event) {
             event.preventDefault();
@@ -199,7 +205,7 @@
 
     <h2>Lista de Clientes</h2>
 
-    <input type="text" id="filtroCliente" placeholder="🔍 Buscar por nome..." oninput="filtrarClientes()" class="barra-pesquisa">
+    <input type="text" id="filtroCliente" placeholder="🔍 Buscar por nome ou codigo..." oninput="filtrarClientes()" class="barra-pesquisa">
 
     <table>
         <thead>

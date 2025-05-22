@@ -48,10 +48,16 @@
             const linhas = document.querySelectorAll("#temas-tbody tr");
 
             linhas.forEach(linha => {
-                const nome = linha.children[1].textContent.toLowerCase(); // index 1 = Nome do Tema
-                linha.style.display = nome.includes(filtro) ? "" : "none";
+                const codTema = linha.children[0].textContent.toLowerCase();  // Código
+                const nome = linha.children[1].textContent.toLowerCase();     // Nome
+
+                linha.style.display =
+                    codTema.includes(filtro) || nome.includes(filtro)
+                        ? ""
+                        : "none";
             });
         }
+
 
 
         async function salvarTema(event) {
@@ -104,7 +110,7 @@
 
     <h2>Lista de Temas</h2>
 
-    <input type="text" id="filtroTema" placeholder="🔍 Buscar por nome do tema..." oninput="filtrarTemas()" class="barra-pesquisa">
+    <input type="text" id="filtroTema" placeholder="🔍 Buscar por nome do tema ou codigo..." oninput="filtrarTemas()" class="barra-pesquisa">
 
     <table>
         <thead>

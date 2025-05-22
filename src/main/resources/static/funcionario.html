@@ -48,10 +48,16 @@
       const linhas = document.querySelectorAll("#funcionarios-tbody tr");
 
       linhas.forEach(linha => {
-        const nome = linha.children[1].textContent.toLowerCase();
-        linha.style.display = nome.includes(filtro) ? "" : "none";
+        const codFuncionario = linha.children[0].textContent.toLowerCase(); // Código
+        const nome = linha.children[1].textContent.toLowerCase();           // Nome
+
+        linha.style.display =
+                codFuncionario.includes(filtro) || nome.includes(filtro)
+                        ? ""
+                        : "none";
       });
     }
+
 
 
     async function preencherSupervisores() {
@@ -119,7 +125,7 @@
 
   <h2>Lista de Funcionários</h2>
 
-  <input type="text" id="filtroFuncionario" placeholder="🔍 Buscar por nome..." oninput="filtrarFuncionarios()" class="barra-pesquisa">
+  <input type="text" id="filtroFuncionario" placeholder="🔍 Buscar por nome ou codigo..." oninput="filtrarFuncionarios()" class="barra-pesquisa">
 
   <table>
     <thead>

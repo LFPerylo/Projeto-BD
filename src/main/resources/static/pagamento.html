@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro de Pagamento</title>
+  <link rel="stylesheet" href="/style.css">
+  <script>
+    let pagamentos = [];
+    let clientes = [];
+    let contratos = [];
+
+    async function carregarDropdowns() {
+      clientes = await fetch("/clientes").then(r => r.json());
+      contratos = await fetch("/orcamentos").then(r => r.json());
+
+      const clienteSelect = document.getElementById("codCliente");
+      const contratoSelect = document.getElementById("numContrato");
+
+      clienteSelect.innerHTML = "<option value=''>Selecione</option>";
+      contratoSelect.innerHTML = "<option value=''>Selecione</option>";
+
+      clientes.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c.codCliente;
+        opt.textContent = c.nome;
+        clienteSelect.appendChild(opt);
+      });
+
+      contratos.forEach(c => {
+        if (c.numContrato) {
+          const opt = document.createElement("option");
+          opt.value = c.numContrato;
+          opt.textContent = `Contrato Nº ${c.numContrato}`;
+          contratoSelect.appendChild(opt);
+        }
+      });
+    }
+
+    async function listarPagamentos() {
+      pagamentos = await fetch("/pagamentos").then(r => r.json());
+      const tbody = document.getElementById("pagamentos-tbody");
+      tbody.innerHTML = "";
+
+      pagamentos.forEach(p => {
+        const cliente = clientes.find(c => c.codCliente === p.codCliente);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${p.codPagamento}</td>
+          <td>${cliente ? cliente.nome : '-'}</td>
+          <td>${p.numContrato}</td>
+          <td>R$ ${p.valorFinal.toFixed(2)}</td>
+          <td>${p.formaPagamento}</td>
+          <td>${p.dataPagamento}</td>
+          <td></td>
+        `;
+
+        const botoesTd = tr.querySelector("td:last-child");
+
+        const editarBtn = document.createElement("button");
+        editarBtn.innerText = "Editar";
+        editarBtn.onclick = () => editarPagamento(p.codPagamento);
+
+        const excluirBtn = document.createElement("button");
+        excluirBtn.innerText = "Excluir";
+        excluirBtn.onclick = async () => {
+          await fetch(`/pagamentos/${p.codPagamento}`, { method: "DELETE" });
+          listarPagamentos();
+        };
+
+        botoesTd.appendChild(editarBtn);
+        botoesTd.appendChild(excluirBtn);
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filtrarPagamentos() {
+      const filtro = document.getElementById("filtroPagamento").value.toLowerCase();
+      const linhas = document.querySelectorAll("#pagamentos-tbody tr");
+
+      linhas.forEach((linha, index) => {
+        const codPagamento = linha.children[0].textContent.toLowerCase();
+        const numContrato = linha.children[2].textContent.toLowerCase();
+
+        linha.style.display =
+                codPagamento.includes(filtro) || numContrato.includes(filtro)
+                        ? ""
+                        : "none";
+      });
+    }
+
+
+    async function salvarPagamento(event) {
+      event.preventDefault();
+
+      const pagamento = {
+        codPagamento: document.getElementById("codPagamento").value || null,
+        valorFinal: parseFloat(document.getElementById("valorFinal").value),
+        valorAcrescentado: parseFloat(document.getElementById("valorAcrescentado").value) || 0,
+        dataPagamento: document.getElementById("dataPagamento").value,
+        formaPagamento: document.getElementById("formaPagamento").value,
+        codCliente: parseInt(document.getElementById("codCliente").value),
+        numContrato: document.getElementById("numContrato").value
+      };
+
+      const method = pagamento.codPagamento ? "PUT" : "POST";
+      const url = pagamento.codPagamento ? `/pagamentos/${pagamento.codPagamento}` : "/pagamentos";
+
+      await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(pagamento)
+      });
+
+      document.getElementById("form-pagamento").reset();
+      listarPagamentos();
+    }
+
+    function editarPagamento(id) {
+      const p = pagamentos.find(p => p.codPagamento === id);
+      document.getElementById("codPagamento").value = p.codPagamento;
+      document.getElementById("valorFinal").value = p.valorFinal;
+      document.getElementById("valorAcrescentado").value = p.valorAcrescentado;
+      document.getElementById("dataPagamento").value = p.dataPagamento;
+      document.getElementById("formaPagamento").value = p.formaPagamento;
+      document.getElementById("codCliente").value = p.codCliente;
+      document.getElementById("numContrato").value = p.numContrato;
+    }
+
+    window.onload = async () => {
+      await carregarDropdowns();
+      await listarPagamentos();
+
+      fetch("/sidebar.html")
+              .then(r => r.text())
+              .then(html => document.getElementById("sidebar-container").innerHTML = html);
+    };
+  </script>
+</head>
+<body>
+<div id="sidebar-container"></div>
+
+<div class="main-content">
+  <h1>Cadastro de Pagamento</h1>
+
+  <form id="form-pagamento" onsubmit="salvarPagamento(event)">
+    <input type="hidden" id="codPagamento">
+
+    <label>Valor Final:</label>
+    <input type="number" id="valorFinal" step="0.01" required>
+
+    <label>Valor Acrescentado (extras):</label>
+    <input type="number" id="valorAcrescentado" step="0.01">
+
+    <label>Data do Pagamento:</label>
+    <input type="date" id="dataPagamento" required>
+
+    <label>Forma de Pagamento:</label>
+    <select id="formaPagamento" required>
+      <option value="dinheiro">Dinheiro</option>
+      <option value="pix">Pix</option>
+      <option value="cartão de crédito">Cartão de Crédito</option>
+      <option value="cartão de débito">Cartão de Débito</option>
+      <option value="boleto">Boleto</option>
+      <option value="transferência bancária">Transferência Bancária</option>
+    </select>
+
+    <label>Cliente:</label>
+    <select id="codCliente" required></select>
+
+    <label>Contrato:</label>
+    <select id="numContrato" required></select>
+
+    <button type="submit">Salvar</button>
+  </form>
+
+  <h2>Lista de Pagamentos</h2>
+
+  <input type="text" id="filtroPagamento" placeholder="🔍 Buscar por código do pagamento ou nº do contrato..." oninput="filtrarPagamentos()" class="barra-pesquisa">
+
+  <table>
+    <thead>
+    <tr>
+      <th>Código</th>
+      <th>Cliente</th>
+      <th>Contrato</th>
+      <th>Valor</th>
+      <th>Forma</th>
+      <th>Data</th>
+      <th>Ações</th>
+    </tr>
+    </thead>
+    <tbody id="pagamentos-tbody"></tbody>
+  </table>
+</div>
+</body>
+</html>
