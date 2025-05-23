@@ -126,33 +126,50 @@ public class ClienteDAO {
             stmt.setInt(8, cliente.getCodCliente());
 
             stmt.executeUpdate();
+
+            // remove registros antigos e insere o tipo atualizado
+            String deletePF = "DELETE FROM Pessoa_Fisica WHERE Cod_Cliente = ?";
+            String deletePJ = "DELETE FROM Pessoa_Juridica WHERE Cod_Cliente = ?";
+            try (PreparedStatement stmt1 = conn.prepareStatement(deletePF)) {
+                stmt1.setInt(1, cliente.getCodCliente());
+                stmt1.executeUpdate();
+            }
+            try (PreparedStatement stmt2 = conn.prepareStatement(deletePJ)) {
+                stmt2.setInt(1, cliente.getCodCliente());
+                stmt2.executeUpdate();
+            }
+
+            if (cliente instanceof PessoaFisica pf) {
+                inserirPessoaFisica(cliente.getCodCliente(), pf, conn);
+            } else if (cliente instanceof PessoaJuridica pj) {
+                inserirPessoaJuridica(cliente.getCodCliente(), pj, conn);
+            }
         }
     }
 
     // DELETE
     public void deletar(int codCliente) throws SQLException {
+        String deleteTelefones = "DELETE FROM Telefones_Cliente WHERE Cod_Cliente = ?";
         String deletePF = "DELETE FROM Pessoa_Fisica WHERE Cod_Cliente = ?";
         String deletePJ = "DELETE FROM Pessoa_Juridica WHERE Cod_Cliente = ?";
         String deleteCliente = "DELETE FROM Cliente WHERE Cod_Cliente = ?";
 
         try (Connection conn = ConexaoBD.conectar()) {
-
-            // Deleta da tabela Pessoa_Fisica
-            try (PreparedStatement stmt = conn.prepareStatement(deletePF)) {
-                stmt.setInt(1, codCliente);
-                stmt.executeUpdate();
+            try (PreparedStatement stmt0 = conn.prepareStatement(deleteTelefones)) {
+                stmt0.setInt(1, codCliente);
+                stmt0.executeUpdate();
             }
-
-            // Deleta da tabela Pessoa_Juridica
-            try (PreparedStatement stmt = conn.prepareStatement(deletePJ)) {
-                stmt.setInt(1, codCliente);
-                stmt.executeUpdate();
+            try (PreparedStatement stmt1 = conn.prepareStatement(deletePF)) {
+                stmt1.setInt(1, codCliente);
+                stmt1.executeUpdate();
             }
-
-            // Finalmente, deleta da tabela Cliente
-            try (PreparedStatement stmt = conn.prepareStatement(deleteCliente)) {
-                stmt.setInt(1, codCliente);
-                stmt.executeUpdate();
+            try (PreparedStatement stmt2 = conn.prepareStatement(deletePJ)) {
+                stmt2.setInt(1, codCliente);
+                stmt2.executeUpdate();
+            }
+            try (PreparedStatement stmt3 = conn.prepareStatement(deleteCliente)) {
+                stmt3.setInt(1, codCliente);
+                stmt3.executeUpdate();
             }
         }
     }
