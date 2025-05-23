@@ -49,10 +49,12 @@
           <td>${cliente ? cliente.nome : '-'}</td>
           <td>${p.numContrato}</td>
           <td>R$ ${p.valorFinal.toFixed(2)}</td>
+          <td>R$ ${p.valorAcrescentado ? p.valorAcrescentado.toFixed(2) : '0,00'}</td>
           <td>${p.formaPagamento}</td>
           <td>${p.dataPagamento}</td>
           <td></td>
         `;
+
 
         const botoesTd = tr.querySelector("td:last-child");
 
@@ -183,7 +185,8 @@
       <th>Código</th>
       <th>Cliente</th>
       <th>Contrato</th>
-      <th>Valor</th>
+      <th>Valor Final</th>
+      <th>Valor Acrescentado</th>
       <th>Forma</th>
       <th>Data</th>
       <th>Ações</th>
