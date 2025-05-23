@@ -58,14 +58,15 @@
 
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
-          <td>${o.codOrcamento}</td>
-          <td>${clienteNome}</td>
-          <td>${funcionarioNome}</td>
-          <td>R$ ${o.valorInicial.toFixed(2)}</td>
-          <td>${temaNome}</td>
-          <td>${o.localFesta}</td>
-          <td></td>
-        `;
+                  <td>${o.codOrcamento}</td>
+                  <td>${o.numContrato || "-"}</td>
+                  <td>R$ ${o.valorInicial?.toFixed(2) || "0,00"}</td>
+                  <td>R$ ${o.valorSinal?.toFixed(2) || "0,00"}</td>
+                  <td>${o.codCliente}</td>
+                  <td>${o.dataAssinatura || "-"}</td>
+                  <td></td>
+                `;
+
 
                 const botoesTd = tr.querySelector("td:last-child");
 
@@ -168,41 +169,66 @@
     <form id="form-orcamento" onsubmit="salvarOrcamento(event)">
         <input type="hidden" id="codOrcamento">
 
-        <label>Contrato Nº:</label>
-        <input type="text" id="numContrato">
+        <div class="input-group">
+            <label>Contrato Nº:</label>
+            <input type="text" id="numContrato">
+        </div>
 
-        <label>Cliente:</label>
-        <select id="codCliente" required></select>
+        <div class="input-group">
+            <label>Cliente:</label>
+            <select id="codCliente" required></select>
+        </div>
 
-        <label>Funcionário:</label>
-        <select id="codFuncionario" required></select>
+        <div class="input-group">
+            <label>Funcionário:</label>
+            <select id="codFuncionario" required></select>
+        </div>
 
-        <label>Tema:</label>
-        <select id="codTema" required></select>
+        <div class="input-group">
+            <label>Tema:</label>
+            <select id="codTema" required></select>
+        </div>
 
-        <label>Data da Festa:</label>
-        <input type="date" id="dataFesta" required>
+        <div class="input-group">
+            <label>Data da Festa:</label>
+            <input type="date" id="dataFesta" required>
+        </div>
 
-        <label>Horário da Festa:</label>
-        <input type="time" id="horarioFesta" required>
+        <div class="input-group">
+            <label>Horário da Festa:</label>
+            <input type="time" id="horarioFesta" required>
+        </div>
 
-        <label>Valor Inicial:</label>
-        <input type="number" id="valorInicial" step="0.01" required>
+        <div class="input-group">
+            <label>Valor Inicial:</label>
+            <input type="number" id="valorInicial" step="0.01" required>
+        </div>
 
-        <label>Local da Festa:</label>
-        <input type="text" id="localFesta">
+        <div class="input-group">
+            <label>Valor do Sinal:</label>
+            <input type="number" id="valorSinal" step="0.01">
+        </div>
 
-        <label>Dia da Semana:</label>
-        <input type="text" id="diaSemana">
+        <div class="input-group">
+            <label>Local da Festa:</label>
+            <input type="text" id="localFesta">
+        </div>
 
-        <label>Data da Assinatura:</label>
-        <input type="date" id="dataAssinatura">
+        <div class="input-group">
+            <label>Dia da Semana:</label>
+            <input type="text" id="diaSemana">
+        </div>
 
-        <label>Valor do Sinal:</label>
-        <input type="number" id="valorSinal" step="0.01">
+        <div class="input-group">
+            <label>Data da Assinatura:</label>
+            <input type="date" id="dataAssinatura">
+        </div>
 
-        <button type="submit">Salvar</button>
+        <div class="input-group full-width">
+            <button type="submit">Salvar</button>
+        </div>
     </form>
+
 
     <h2>Lista de Orçamentos</h2>
 
@@ -211,15 +237,16 @@
     <table>
         <thead>
         <tr>
-            <th>Código</th>
-            <th>Cliente</th>
-            <th>Funcionário</th>
-            <th>Valor</th>
-            <th>Tema</th>
-            <th>Local</th>
+            <th>Código do Orçamento</th>
+            <th>Número do Contrato</th>
+            <th>Valor Inicial</th>
+            <th>Valor do Sinal</th>
+            <th>Código do Cliente</th>
+            <th>Data da Assinatura</th>
             <th>Ações</th>
         </tr>
         </thead>
+
         <tbody id="orcamentos-tbody"></tbody>
     </table>
 </div>

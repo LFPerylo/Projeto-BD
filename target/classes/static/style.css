@@ -400,6 +400,30 @@ section {
     color: #4a005f;
 }
 
+form#form-orcamento {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 20px;
+    max-width: 900px;
+    margin-bottom: 20px;
+}
+
+form#form-orcamento label {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+form#form-orcamento .input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+form#form-orcamento button {
+    grid-column: span 2;
+    padding: 10px;
+}
+
+
 
 
 
