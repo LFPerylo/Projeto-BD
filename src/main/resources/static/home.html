@@ -49,11 +49,13 @@
     <h2>📅 Festas por Mês</h2>
 
     <div class="filtro-dashboard">
-      <input type="number" id="input-ano" placeholder="Ano (ex: 2025)">
+      <input type="number" id="input-ano" placeholder="Ano (ex: 2025)" class="input-ano">
       <button onclick="carregarGraficoFestasPorMes()">Ver Gráfico</button>
     </div>
 
-    <canvas id="grafico-festas" width="600" height="300"></canvas>
+    <div class="grafico-container">
+      <canvas id="grafico-festas"></canvas>
+    </div>
   </section>
 
 

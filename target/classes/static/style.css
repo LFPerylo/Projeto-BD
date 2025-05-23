@@ -365,6 +365,27 @@ section {
     font-weight: bold;
 }
 
+.filtro-dashboard {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-ano {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    width: 160px;
+    font-size: 14px;
+}
+
+.grafico-container {
+    max-width: 700px;
+    margin-left: 0px;
+}
+
+
 
 
 
