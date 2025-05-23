@@ -169,66 +169,41 @@
     <form id="form-orcamento" onsubmit="salvarOrcamento(event)">
         <input type="hidden" id="codOrcamento">
 
-        <div class="input-group">
-            <label>Contrato Nº:</label>
-            <input type="text" id="numContrato">
-        </div>
+        <label>Contrato Nº:</label>
+        <input type="text" id="numContrato">
 
-        <div class="input-group">
-            <label>Cliente:</label>
-            <select id="codCliente" required></select>
-        </div>
+        <label>Cliente:</label>
+        <select id="codCliente" required></select>
 
-        <div class="input-group">
-            <label>Funcionário:</label>
-            <select id="codFuncionario" required></select>
-        </div>
+        <label>Funcionário:</label>
+        <select id="codFuncionario" required></select>
 
-        <div class="input-group">
-            <label>Tema:</label>
-            <select id="codTema" required></select>
-        </div>
+        <label>Tema:</label>
+        <select id="codTema" required></select>
 
-        <div class="input-group">
-            <label>Data da Festa:</label>
-            <input type="date" id="dataFesta" required>
-        </div>
+        <label>Data da Festa:</label>
+        <input type="date" id="dataFesta" required>
 
-        <div class="input-group">
-            <label>Horário da Festa:</label>
-            <input type="time" id="horarioFesta" required>
-        </div>
+        <label>Horário da Festa:</label>
+        <input type="time" id="horarioFesta" required>
 
-        <div class="input-group">
-            <label>Valor Inicial:</label>
-            <input type="number" id="valorInicial" step="0.01" required>
-        </div>
+        <label>Valor Inicial:</label>
+        <input type="number" id="valorInicial" step="0.01" required>
 
-        <div class="input-group">
-            <label>Valor do Sinal:</label>
-            <input type="number" id="valorSinal" step="0.01">
-        </div>
+        <label>Local da Festa:</label>
+        <input type="text" id="localFesta">
 
-        <div class="input-group">
-            <label>Local da Festa:</label>
-            <input type="text" id="localFesta">
-        </div>
+        <label>Dia da Semana:</label>
+        <input type="text" id="diaSemana">
 
-        <div class="input-group">
-            <label>Dia da Semana:</label>
-            <input type="text" id="diaSemana">
-        </div>
+        <label>Data da Assinatura:</label>
+        <input type="date" id="dataAssinatura">
 
-        <div class="input-group">
-            <label>Data da Assinatura:</label>
-            <input type="date" id="dataAssinatura">
-        </div>
+        <label>Valor do Sinal:</label>
+        <input type="number" id="valorSinal" step="0.01">
 
-        <div class="input-group full-width">
-            <button type="submit">Salvar</button>
-        </div>
+        <button type="submit">Salvar</button>
     </form>
-
 
     <h2>Lista de Orçamentos</h2>
 
