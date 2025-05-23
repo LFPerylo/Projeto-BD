@@ -128,5 +128,28 @@ public class PagamentoDAO {
         }
     }
 
+    public double somarFaturamentoMesAtual() throws SQLException {
+        String sql = """
+        SELECT SUM(Valor_Final)
+        FROM pagamento
+        WHERE MONTH(Data_Pagamento) = MONTH(CURRENT_DATE())
+          AND YEAR(Data_Pagamento) = YEAR(CURRENT_DATE())
+    """;
+
+        try (Connection conn = ConexaoBD.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+        }
+
+        return 0.0;
+    }
+
+
+
+
 
 }

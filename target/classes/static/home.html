@@ -13,6 +13,13 @@
 <div class="main-content">
   <h1>DashBoards</h1>
 
+  <div class="card-container">
+    <div class="card resumo-card">Total de Clientes: <span id="card-clientes">-</span></div>
+    <div class="card resumo-card">Faturamento no Mês: <span id="card-faturamento">-</span></div>
+    <div class="card resumo-card">Festas no Mês: <span id="card-festas">-</span></div>
+  </div>
+
+
   <section id="dashboard">
     <h2> Temas Mais Utilizados</h2>
     <canvas id="grafico-temas" width="600" height="300"></canvas>
@@ -231,13 +238,28 @@
     }
   }
 
+  async function carregarResumoDashboard() {
+    try {
+      const res = await fetch("/dashboard/resumo");
+      const dados = await res.json();
 
+      document.getElementById("card-clientes").innerText =
+              dados.totalClientes != null ? dados.totalClientes : "-";
+      document.getElementById("card-faturamento").innerText =
+              dados.faturamentoMesAtual != null ? "R$ " + dados.faturamentoMesAtual.toFixed(2) : "R$ 0,00";
+      document.getElementById("card-festas").innerText =
+              dados.festasMesAtual != null ? dados.festasMesAtual : "-";
+    } catch (erro) {
+      console.error("Erro ao carregar dashboard:", erro);
+    }
+  }
 
   // Ao carregar a página
   window.onload = () => {
     carregarGraficoTemas();
     carregarGraficoAniversariantes();
     carregarGraficoFestasPorMes();
+    carregarResumoDashboard()
   };
 </script>
 

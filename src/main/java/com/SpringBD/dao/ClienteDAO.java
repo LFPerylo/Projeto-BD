@@ -157,5 +157,19 @@ public class ClienteDAO {
         }
     }
 
+    public int contarClientes() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM cliente";
+        try (Connection conn = ConexaoBD.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+
+
 
 }

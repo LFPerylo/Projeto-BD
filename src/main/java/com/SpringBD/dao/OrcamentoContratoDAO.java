@@ -153,6 +153,27 @@ public class OrcamentoContratoDAO {
         }
     }
 
+    public int contarFestasMesAtual() throws SQLException {
+        String sql = """
+        SELECT COUNT(*) AS total 
+        FROM orcamento_contrato 
+        WHERE MONTH(Data_Festa) = MONTH(CURRENT_DATE())
+          AND YEAR(Data_Festa) = YEAR(CURRENT_DATE());
+    """;
+
+        try (Connection conn = ConexaoBD.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        }
+
+        return 0;
+    }
+
+
 
 
 
