@@ -4,6 +4,18 @@
   <meta charset="UTF-8">
   <title>Cadastro de Festa</title>
   <link rel="stylesheet" href="/style.css">
+  <style>
+    /* Remove setinhas dos inputs tipo number */
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+  </style>
   <script>
     let festas = [];
     let contratos = [];
@@ -74,35 +86,39 @@
       });
     }
 
-    async function filtrarFestas() {
-      const filtro = document.getElementById("filtroFesta").value.toLowerCase();
-      const linhas = document.querySelectorAll("#festas-tbody tr");
+    function adicionarAniversariante() {
+      const nome = document.getElementById("nomeAniversariante").value.trim();
+      const idade = parseInt(document.getElementById("idadeAniversariante").value);
+      const dataNascimento = document.getElementById("dataNascimentoAniversariante").value;
 
-      for (const linha of linhas) {
-        const codFesta = linha.children[0].textContent.toLowerCase();
-
-        // Buscar aniversariantes dessa festa
-        const idFesta = linha.children[0].textContent;
-        const response = await fetch(`/festas/${idFesta}/aniversariantes`);
-        const listaAniversariantes = await response.json();
-        const codigosAniversariantes = listaAniversariantes.map(a => a.codAniversariante.toString());
-
-        const corresponde = codFesta.includes(filtro) || codigosAniversariantes.some(c => c.includes(filtro));
-        linha.style.display = corresponde ? "" : "none";
+      if (!nome || !idade || !dataNascimento) {
+        alert("Preencha todos os campos do aniversariante.");
+        return;
       }
-    }
 
+      aniversariantes.push({ nome, idade, dataNascimento });
+
+      const li = document.createElement("li");
+      li.textContent = `${nome} (${idade} anos) - ${dataNascimento}`;
+      document.getElementById("aniversariantes-lista").appendChild(li);
+
+      document.getElementById("nomeAniversariante").value = "";
+      document.getElementById("idadeAniversariante").value = "";
+      document.getElementById("dataNascimentoAniversariante").value = "";
+    }
 
     async function salvarFesta(event) {
       event.preventDefault();
 
-      // Se campos de aniversariante foram preenchidos, adiciona
-      const nome = document.getElementById("nomeAniversariante").value;
-      const idade = parseInt(document.getElementById("idadeAniversariante").value);
-      const dataNascimento = document.getElementById("dataNascimentoAniversariante").value;
+      if (aniversariantes.length === 0) {
+        alert("Adicione pelo menos um aniversariante.");
+        return;
+      }
 
-      if (nome && idade && dataNascimento) {
-        aniversariantes.push({ nome, idade, dataNascimento });
+      const ano = parseInt(document.getElementById("anoFesta").value);
+      if (!ano || ano < 1900) {
+        alert("Informe um ano válido para a realização da festa.");
+        return;
       }
 
       const festaPayload = {
@@ -113,7 +129,7 @@
           horarioFim: document.getElementById("horarioFim").value
         },
         aniversariantes: aniversariantes,
-        ano: new Date().getFullYear()
+        ano: ano
       };
 
       const method = festaPayload.festa.codFesta ? "PUT" : "POST";
@@ -128,7 +144,9 @@
       });
 
       document.getElementById("form-festa").reset();
+      document.getElementById("aniversariantes-lista").innerHTML = "";
       aniversariantes = [];
+
       listarFestas();
     }
 
@@ -167,18 +185,21 @@
     <label>Horário de Fim:</label>
     <input type="time" id="horarioFim" required>
 
-    <h3>Aniversariante (opcional)</h3>
+    <label>Ano da Festa:</label>
+    <input type="number" id="anoFesta" placeholder="Ex: 2022" required>
+
+    <h3>Aniversariantes</h3>
     <input type="text" id="nomeAniversariante" placeholder="Nome">
     <input type="number" id="idadeAniversariante" placeholder="Idade">
     <input type="date" id="dataNascimentoAniversariante">
+    <button type="button" onclick="adicionarAniversariante()">Adicionar Aniversariante</button>
+
+    <ul id="aniversariantes-lista"></ul>
 
     <button type="submit">Salvar Festa</button>
   </form>
 
   <h2>Lista de Festas</h2>
-
-  <input type="text" id="filtroFesta" placeholder="🔍 Buscar por código da festa ou aniversariante..." oninput="filtrarFestas()" class="barra-pesquisa">
-
   <table>
     <thead>
     <tr>
