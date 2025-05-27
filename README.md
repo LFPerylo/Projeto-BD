@@ -1,6 +1,12 @@
-# 🎉 Projeto de Banco de Dados - Sistema de Gerenciamento de Festas Infantis
 
-Este projeto foi desenvolvido com **Java (Spring Boot)** e **MySQL**, com foco na criação de um sistema CRUD completo, sem uso de frameworks de persistência como JPA ou Hibernate. Toda a comunicação com o banco é feita por meio de comandos SQL puros via **JDBC**.
+# 🎉 Sistema de Gerenciamento de Festas Infantis – Projeto de Banco de Dados
+
+Este projeto foi desenvolvido com **Java (Spring Boot)** e **MySQL**, com foco em um sistema completo de gerenciamento de festas infantis. Todas as operações são realizadas utilizando **JDBC puro**, sem o uso de frameworks ORM como JPA ou Hibernate.
+
+A aplicação permite o cadastro, edição, exclusão e consulta de informações envolvendo **clientes, festas, aniversariantes, contratos, temas, pagamentos** e muito mais. Conta ainda com **painéis de controle (dashboards)** interativos e scripts avançados no banco.
+
+> 🔗 Acesse a aplicação localmente em:  
+> 📍 [`http://localhost:8080/login.html`](http://localhost:8080/login.html)
 
 ---
 
@@ -13,35 +19,59 @@ cd Projeto-BD
 
 ---
 
-## 📚 Documentação do Banco de Dados
+## 🧠 Modelagem e Scripts
 
-### 🧠 Modelos
+### 📊 Modelos
 
-- [Modelo Conceitual](documentacao/Conceitual_Projeto_Final.png)
-- [Modelo Lógico](documentacao/Logico_Projeto_Final.png)
+- 🧩 [Modelo Conceitual](documentacao/Conceitual_Projeto_Final.png)
+- 🧩 [Modelo Lógico](documentacao/Logico_Projeto_Final.png)
 
 ### 📜 Scripts SQL
 
-- [Script de Criação das Tabelas](documentacao/Script-Projeto.sql)
-- [Script de Inserção de Dados](documentacao/Script-insercao-projeto.sql)
+- 🏗️ [Script de Criação de Tabelas](documentacao/Script-Projeto.sql)
+- ✍️ [Script de Inserção de Dados](documentacao/Script-insercao-projeto.sql)
+- 📌 Scripts Programáveis:
+  - [`resumo_financeiro_completo`](documentacao/Script-resumo-financeiro.sql):
+    ```sql
+    CREATE PROCEDURE resumo_financeiro_completo(IN contrato INT)
+    BEGIN
+        SELECT 
+            o.Num_Contrato,
+            o.Valor_Inicial AS valor_inicial,
+            o.Valor_Sinal AS valor_sinal,
+            IFNULL(SUM(p.Valor_Acrescentado), 0) AS valor_extra,
+            (o.Valor_Inicial + IFNULL(SUM(p.Valor_Acrescentado), 0)) AS valor_final
+        FROM orcamento_contrato o
+        LEFT JOIN pagamento p ON o.Num_Contrato = p.Num_Contrato
+        WHERE o.Num_Contrato = contrato
+        GROUP BY o.Num_Contrato, o.Valor_Inicial, o.Valor_Sinal;
+    END;
+    ```
+  - [`festas_por_mes` e `festas_por_mes_e_ano`](documentacao/Script-festas-por-ano.sql):
+    ```sql
+    CREATE PROCEDURE festas_por_mes(IN ano INT)
+    BEGIN
+      SELECT MONTH(Data_Festa) AS mes, COUNT(*) AS quantidade
+      FROM orcamento_contrato
+      WHERE YEAR(Data_Festa) = ano
+      GROUP BY mes ORDER BY mes;
+    END;
+    ```
+  - [`verificar_aniversariantes_proximos` + Trigger + Evento](documentacao/Script-alerta-aniversario.sql)
 
 ---
 
 ## ⚙️ Pré-requisitos
 
-Antes de executar o projeto, verifique se possui os seguintes requisitos instalados:
-
-- ✅ Java 17 (recomendado: Amazon Corretto)
-- ✅ MySQL Server (rodando na porta `3306`)
+- ✅ Java 17 (Amazon Corretto recomendado)
+- ✅ MySQL Server (porta padrão: 3306)
 - ✅ Maven configurado no PATH
 
 ---
 
-## 🔐 Configuração do Banco (.env)
+## 🔐 Configuração de Ambiente
 
-Como o projeto utiliza variáveis de ambiente para manter os dados seguros, você deve criar manualmente um arquivo `.env` na raiz do projeto:
-
-> 📂 Exemplo: `.env`
+Crie um arquivo `.env` com:
 
 ```env
 DB_URL=jdbc:mysql://localhost:3306/projeto-bd?useSSL=false&serverTimezone=UTC
@@ -49,41 +79,60 @@ DB_USERNAME=root
 DB_PASSWORD=sua_senha
 ```
 
-> ☑️ Um modelo de referência está disponível em [.env.example](.env.example)
+> Exemplo disponível em `.env.example`
 
 ---
 
-## 🧪 Testando a Conexão com o Banco
-
-O projeto inclui uma classe para teste de conexão:
+## 🧪 Teste de Conexão
 
 ```java
 src/main/java/com/SpringBD/TesteConexao.java
 ```
 
-> ✅ Ao executar essa classe, será exibida a mensagem de sucesso ou falha de conexão com o banco de dados.
-
 ---
 
-## 🚀 Inicialização do Projeto
-
-Após configurar o `.env` e o banco:
+## 🚀 Inicialização
 
 ```bash
 mvn clean install
 ```
 
-Execute a aplicação pela classe:
-
-```java
+```bash
 src/main/java/com/SpringBD/SpringBdApplication.java
 ```
 
 ---
 
+## 📋 Funcionalidades
+
+- CRUD completo para:
+  - Cliente (com herança PF/PJ)
+  - Funcionário
+  - Festa
+  - Tema
+  - Pagamento
+  - OrçamentoContrato
+  - TelefonesCliente
+  - Aniversariante (entidade fraca)
+- Filtros por chaves e atributos
+- Spring Boot + HTML + CSS + JavaScript
+- Dashboard interativo com dados dinâmicos
+- Scripts avançados (procedures, trigger, evento)
+
+---
+
+## 📊 Dashboards Disponíveis
+
+- 👥 Total de clientes
+- 💰 Faturamento no mês (com filtro)
+- 🎈 Festas do mês atual
+- 🎨 Temas mais utilizados
+- 🎂 Aniversariantes nos próximos 45 dias
+- 🧾 Resumo financeiro de contratos
+- 📅 Festas por mês (com filtro de ano)
+
+---
+
 ## 📄 Licença
 
-Este projeto está licenciado sob os termos da [Licença MIT](LICENSE).
-```
-
-URL DA APLICAÇÃO:http://localhost:8080/home.html
+Distribuído sob a licença [MIT](LICENSE).
