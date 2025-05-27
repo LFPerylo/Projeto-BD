@@ -148,8 +148,4 @@ public class PagamentoDAO {
         return 0.0;
     }
 
-
-
-
-
 }

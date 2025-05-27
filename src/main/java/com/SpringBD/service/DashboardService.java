@@ -23,4 +23,7 @@ public class DashboardService {
     public int getFestasMesAtual() throws SQLException {
         return orcamentoContratoDAO.contarFestasMesAtual();
     }
+
+
+
 }
