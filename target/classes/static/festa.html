@@ -15,6 +15,13 @@
     input[type=number] {
       -moz-appearance: textfield;
     }
+
+    .barra-pesquisa {
+      width: 100%;
+      padding: 8px;
+      margin: 12px 0;
+      box-sizing: border-box;
+    }
   </style>
   <script>
     let festas = [];
@@ -158,6 +165,22 @@
       document.getElementById("horarioFim").value = f.horarioFim;
     }
 
+    function filtrarFestas() {
+      const filtro = document.getElementById("filtroFesta").value.toLowerCase();
+      const linhas = document.querySelectorAll("#festas-tbody tr");
+
+      linhas.forEach(linha => {
+        const cod = linha.children[0].textContent.toLowerCase();
+        const contrato = linha.children[1].textContent.toLowerCase();
+        const tema = linha.children[2].textContent.toLowerCase();
+
+        linha.style.display =
+                cod.includes(filtro) || contrato.includes(filtro) || tema.includes(filtro)
+                        ? ""
+                        : "none";
+      });
+    }
+
     window.onload = async () => {
       await carregarDropdowns();
       await listarFestas();
@@ -200,6 +223,9 @@
   </form>
 
   <h2>Lista de Festas</h2>
+
+  <input type="text" id="filtroFesta" placeholder="🔍 Buscar por código, contrato ou tema..." oninput="filtrarFestas()" class="barra-pesquisa">
+
   <table>
     <thead>
     <tr>

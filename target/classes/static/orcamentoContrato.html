@@ -52,21 +52,16 @@
             tbody.innerHTML = "";
 
             orcamentos.forEach(o => {
-                const clienteNome = clientes.find(c => c.codCliente === o.codCliente)?.nome || "-";
-                const funcionarioNome = funcionarios.find(f => f.codFuncionario === o.codFuncionario)?.nome || "-";
-                const temaNome = temas.find(t => t.codTema === o.codTema)?.nome || "-";
-
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
-                  <td>${o.codOrcamento}</td>
-                  <td>${o.numContrato || "-"}</td>
-                  <td>R$ ${o.valorInicial?.toFixed(2) || "0,00"}</td>
-                  <td>R$ ${o.valorSinal?.toFixed(2) || "0,00"}</td>
-                  <td>${o.codCliente}</td>
-                  <td>${o.dataAssinatura || "-"}</td>
-                  <td></td>
-                `;
-
+          <td>${o.codOrcamento}</td>
+          <td>${o.numContrato || "-"}</td>
+          <td>R$ ${o.valorInicial?.toFixed(2) || "0,00"}</td>
+          <td>R$ ${o.valorSinal?.toFixed(2) || "0,00"}</td>
+          <td>${o.codCliente}</td>
+          <td>${o.dataAssinatura || "-"}</td>
+          <td></td>
+        `;
 
                 const botoesTd = tr.querySelector("td:last-child");
 
@@ -78,7 +73,7 @@
                 excluirBtn.textContent = "Excluir";
                 excluirBtn.onclick = async () => {
                     await fetch(`/orcamentos/${o.codOrcamento}`, { method: "DELETE" });
-                    listarOrcamentos();
+                    await listarOrcamentos();
                 };
 
                 botoesTd.appendChild(editarBtn);
@@ -87,21 +82,23 @@
             });
         }
 
-        function filtrarOrcamentos() {
-            const filtro = document.getElementById("filtroOrcamento").value.toLowerCase();
-            const linhas = document.querySelectorAll("#orcamentos-tbody tr");
+        function editarOrcamento(id) {
+            const o = orcamentos.find(x => x.codOrcamento == id);
+            if (!o) return;
 
-            linhas.forEach(linha => {
-                const codOrcamento = linha.children[0].textContent.toLowerCase();
-                const numContrato = orcamentos.find(o => o.codOrcamento == codOrcamento)?.numContrato?.toString().toLowerCase() || "";
-
-                linha.style.display =
-                    codOrcamento.includes(filtro) || numContrato.includes(filtro)
-                        ? ""
-                        : "none";
-            });
+            document.getElementById("codOrcamento").value = o.codOrcamento;
+            document.getElementById("numContrato").value = o.numContrato || "";
+            document.getElementById("codCliente").value = o.codCliente;
+            document.getElementById("codFuncionario").value = o.codFuncionario;
+            document.getElementById("codTema").value = o.codTema;
+            document.getElementById("dataFesta").value = o.dataFesta;
+            document.getElementById("horarioFesta").value = o.horarioFesta;
+            document.getElementById("valorInicial").value = o.valorInicial;
+            document.getElementById("localFesta").value = o.localFesta || "";
+            document.getElementById("diaSemana").value = o.diaSemana || "";
+            document.getElementById("dataAssinatura").value = o.dataAssinatura || "";
+            document.getElementById("valorSinal").value = o.valorSinal || "";
         }
-
 
         async function salvarOrcamento(event) {
             event.preventDefault();
@@ -131,29 +128,26 @@
             });
 
             document.getElementById("form-orcamento").reset();
-            listarOrcamentos();
+            await listarOrcamentos();
         }
 
-        function editarOrcamento(id) {
-            const o = orcamentos.find(x => x.codOrcamento === id);
-            document.getElementById("codOrcamento").value = o.codOrcamento;
-            document.getElementById("numContrato").value = o.numContrato || "";
-            document.getElementById("codCliente").value = o.codCliente;
-            document.getElementById("codFuncionario").value = o.codFuncionario;
-            document.getElementById("codTema").value = o.codTema;
-            document.getElementById("dataFesta").value = o.dataFesta;
-            document.getElementById("horarioFesta").value = o.horarioFesta;
-            document.getElementById("valorInicial").value = o.valorInicial;
-            document.getElementById("localFesta").value = o.localFesta;
-            document.getElementById("diaSemana").value = o.diaSemana;
-            document.getElementById("dataAssinatura").value = o.dataAssinatura || "";
-            document.getElementById("valorSinal").value = o.valorSinal || "";
+        function filtrarOrcamentos() {
+            const filtro = document.getElementById("filtroOrcamento").value.toLowerCase();
+            const linhas = document.querySelectorAll("#orcamentos-tbody tr");
+
+            linhas.forEach(linha => {
+                const codOrcamento = linha.children[0].textContent.toLowerCase();
+                const numContrato = linha.children[1].textContent.toLowerCase();
+                linha.style.display =
+                    codOrcamento.includes(filtro) || numContrato.includes(filtro)
+                        ? ""
+                        : "none";
+            });
         }
 
         window.onload = async () => {
             await carregarDropdowns();
             await listarOrcamentos();
-
             fetch("/sidebar.html")
                 .then(res => res.text())
                 .then(html => document.getElementById("sidebar-container").innerHTML = html);
@@ -221,7 +215,6 @@
             <th>Ações</th>
         </tr>
         </thead>
-
         <tbody id="orcamentos-tbody"></tbody>
     </table>
 </div>
