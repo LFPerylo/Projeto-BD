@@ -31,32 +31,8 @@ cd Projeto-BD
 - 🏗️ [Script de Criação de Tabelas](documentacao/Script-Projeto.sql)
 - ✍️ [Script de Inserção de Dados](documentacao/Script-insercao-projeto.sql)
 - 📌 Scripts Programáveis:
-  - [`resumo_financeiro_completo`](documentacao/Script-resumo-financeiro.sql):
-    ```sql
-    CREATE PROCEDURE resumo_financeiro_completo(IN contrato INT)
-    BEGIN
-        SELECT 
-            o.Num_Contrato,
-            o.Valor_Inicial AS valor_inicial,
-            o.Valor_Sinal AS valor_sinal,
-            IFNULL(SUM(p.Valor_Acrescentado), 0) AS valor_extra,
-            (o.Valor_Inicial + IFNULL(SUM(p.Valor_Acrescentado), 0)) AS valor_final
-        FROM orcamento_contrato o
-        LEFT JOIN pagamento p ON o.Num_Contrato = p.Num_Contrato
-        WHERE o.Num_Contrato = contrato
-        GROUP BY o.Num_Contrato, o.Valor_Inicial, o.Valor_Sinal;
-    END;
-    ```
-  - [`festas_por_mes` e `festas_por_mes_e_ano`](documentacao/Script-festas-por-ano.sql):
-    ```sql
-    CREATE PROCEDURE festas_por_mes(IN ano INT)
-    BEGIN
-      SELECT MONTH(Data_Festa) AS mes, COUNT(*) AS quantidade
-      FROM orcamento_contrato
-      WHERE YEAR(Data_Festa) = ano
-      GROUP BY mes ORDER BY mes;
-    END;
-    ```
+  - [`resumo_financeiro_completo`](documentacao/Script-resumo-financeiro.sql)
+  - [`festas_por_mes` e `festas_por_mes_e_ano`](documentacao/Script-festas-por-ano.sql)
   - [`verificar_aniversariantes_proximos` + Trigger + Evento](documentacao/Script-alerta-aniversario.sql)
 
 ---
