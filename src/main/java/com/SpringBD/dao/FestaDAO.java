@@ -85,15 +85,60 @@ public class FestaDAO {
     }
 
     public void deletar(int codFesta) throws SQLException {
-        String sql = "DELETE FROM Festa WHERE Cod_Festa = ?";
+        String buscarAniversariantes = "SELECT Cod_Aniversariante FROM Contem WHERE Cod_Festa = ?";
+        String verificarOutrasFestas = "SELECT COUNT(*) FROM Contem WHERE Cod_Aniversariante = ? AND Cod_Festa <> ?";
+        String deletarAniversariante = "DELETE FROM Aniversariante WHERE Cod_Aniversariante = ?";
+        String deletarContem = "DELETE FROM Contem WHERE Cod_Festa = ?";
+        String deletarFesta = "DELETE FROM Festa WHERE Cod_Festa = ?";
 
-        try (Connection conn = ConexaoBD.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConexaoBD.conectar()) {
 
-            stmt.setInt(1, codFesta);
-            stmt.executeUpdate();
+            // 1. Buscar os aniversariantes dessa festa
+            List<Integer> aniversariantes = new ArrayList<>();
+            try (PreparedStatement stmt = conn.prepareStatement(buscarAniversariantes)) {
+                stmt.setInt(1, codFesta);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        aniversariantes.add(rs.getInt("Cod_Aniversariante"));
+                    }
+                }
+            }
+
+            // 2. Verificar se o aniversariante está vinculado a outras festas
+            for (int codAniv : aniversariantes) {
+                try (PreparedStatement stmt = conn.prepareStatement(verificarOutrasFestas)) {
+                    stmt.setInt(1, codAniv);
+                    stmt.setInt(2, codFesta);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        if (rs.next() && rs.getInt(1) == 0) {
+                            // Se não estiver vinculado a outras festas, pode excluir da tabela aniversariante
+                            try (PreparedStatement stmtDel = conn.prepareStatement(deletarAniversariante)) {
+                                stmtDel.setInt(1, codAniv);
+                                stmtDel.executeUpdate();
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 3. Agora sim, excluir da tabela contem
+            try (PreparedStatement stmt = conn.prepareStatement(deletarContem)) {
+                stmt.setInt(1, codFesta);
+                stmt.executeUpdate();
+            }
+
+            // 4. Por fim, excluir a festa
+            try (PreparedStatement stmt = conn.prepareStatement(deletarFesta)) {
+                stmt.setInt(1, codFesta);
+                stmt.executeUpdate();
+            }
         }
     }
+
+
+
+
+
 
 
 }

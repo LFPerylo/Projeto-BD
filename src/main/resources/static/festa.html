@@ -181,9 +181,46 @@
       });
     }
 
+    async function listarAniversariantesComFesta() {
+      const response = await fetch("/festas/aniversariantes-todos");
+      const dados = await response.json();
+      const tbody = document.getElementById("aniversariantes-tbody");
+      tbody.innerHTML = "";
+
+      dados.forEach(a => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+      <td>${a.codAniversariante}</td>
+      <td>${a.codFesta}</td>
+      <td>${a.nome}</td>
+      <td>${a.dataNascimento}</td>
+    `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filtrarAniversariantes() {
+      const filtro = document.getElementById("filtro-aniversariante").value.toLowerCase();
+      const linhas = document.querySelectorAll("#aniversariantes-tbody tr");
+
+      linhas.forEach(linha => {
+        const codAniversariante = linha.children[0].textContent.toLowerCase();
+        const codFesta = linha.children[1].textContent.toLowerCase();
+
+        linha.style.display =
+                codAniversariante.includes(filtro) || codFesta.includes(filtro)
+                        ? ""
+                        : "none";
+      });
+    }
+
+
+
     window.onload = async () => {
       await carregarDropdowns();
       await listarFestas();
+      await listarAniversariantesComFesta();
+
 
       fetch("/sidebar.html")
               .then(res => res.text())
@@ -238,6 +275,23 @@
     </thead>
     <tbody id="festas-tbody"></tbody>
   </table>
+
+  <h2>Lista de Aniversariantes</h2>
+
+  <input type="text" id="filtro-aniversariante" placeholder="🔍 Buscar por código do aniversariante ou da festa..." oninput="filtrarAniversariantes()" class="barra-pesquisa">
+
+  <table>
+    <thead>
+    <tr>
+      <th>Código do Aniversariante</th>
+      <th>Código da Festa</th>
+      <th>Nome</th>
+      <th>Data de Nascimento</th>
+    </tr>
+    </thead>
+    <tbody id="aniversariantes-tbody"></tbody>
+  </table>
+
 </div>
 </body>
 </html>

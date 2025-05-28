@@ -1,6 +1,7 @@
 package com.SpringBD.controller;
 
 import com.SpringBD.dao.AniversarianteDAO;
+import com.SpringBD.dao.ContemDAO;
 import com.SpringBD.dao.OrcamentoContratoDAO;
 import com.SpringBD.model.Aniversariante;
 import com.SpringBD.model.Festa;
@@ -110,5 +111,11 @@ public class FestaController {
             this.ano = ano;
         }
     }
+
+    @GetMapping("/aniversariantes-todos")
+    public List<Map<String, Object>> listarAniversariantesComFesta() throws SQLException {
+        return new ContemDAO().buscarTodosComDetalhes();
+    }
+
 
 }

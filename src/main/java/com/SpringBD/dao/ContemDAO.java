@@ -6,7 +6,9 @@ import com.SpringBD.model.Contem;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ContemDAO {
 
@@ -86,4 +88,28 @@ public class ContemDAO {
             stmt.executeUpdate();
         }
     }
+
+    public List<Map<String, Object>> buscarTodosComDetalhes() throws SQLException {
+        String sql = """
+        SELECT c.Cod_Festa, a.Cod_Aniversariante, a.Nome, a.Data_Nascimento
+        FROM contem c
+        JOIN aniversariante a ON c.Cod_Aniversariante = a.Cod_Aniversariante
+    """;
+        try (Connection conn = ConexaoBD.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            List<Map<String, Object>> lista = new ArrayList<>();
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("codFesta", rs.getInt("Cod_Festa"));
+                map.put("codAniversariante", rs.getInt("Cod_Aniversariante"));
+                map.put("nome", rs.getString("Nome"));
+                map.put("dataNascimento", rs.getDate("Data_Nascimento").toString());
+                lista.add(map);
+            }
+            return lista;
+        }
+    }
+
 }
