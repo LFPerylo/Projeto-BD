@@ -2,217 +2,167 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastro de Orçamento</title>
+    <title>Cadastro de Orçamento / Contrato</title>
     <link rel="stylesheet" href="/style.css">
     <script>
-        let orcamentos = [];
-        let clientes = [];
-        let funcionarios = [];
-        let temas = [];
+        let orcamentos = [], clientes = [], funcionarios = [], temas = [];
 
         async function carregarDropdowns() {
-            clientes = await fetch("/clientes").then(r => r.json());
-            funcionarios = await fetch("/funcionarios").then(r => r.json());
-            temas = await fetch("/temas").then(r => r.json());
-
-            const clienteSelect = document.getElementById("codCliente");
-            const funcionarioSelect = document.getElementById("codFuncionario");
-            const temaSelect = document.getElementById("codTema");
-
-            clienteSelect.innerHTML = "<option value=''>Selecione</option>";
-            funcionarioSelect.innerHTML = "<option value=''>Selecione</option>";
-            temaSelect.innerHTML = "<option value=''>Selecione</option>";
-
+            [clientes, funcionarios, temas] = await Promise.all([
+                fetch("/clientes").then(r => r.json()),
+                fetch("/funcionarios").then(r => r.json()),
+                fetch("/temas").then(r => r.json())
+            ]);
+            const sel = id => document.getElementById(id);
+            sel("codCliente").innerHTML = "<option value=''>Selecione</option>";
+            sel("codFuncionario").innerHTML = "<option value=''>Selecione</option>";
+            sel("codTema").innerHTML = "<option value=''>Selecione</option>";
             clientes.forEach(c => {
-                const opt = document.createElement("option");
-                opt.value = c.codCliente;
-                opt.textContent = c.nome;
-                clienteSelect.appendChild(opt);
+                const o = new Option(c.nome, c.codCliente);
+                sel("codCliente").append(o);
             });
-
             funcionarios.forEach(f => {
-                const opt = document.createElement("option");
-                opt.value = f.codFuncionario;
-                opt.textContent = f.nome;
-                funcionarioSelect.appendChild(opt);
+                const o = new Option(f.nome, f.codFuncionario);
+                sel("codFuncionario").append(o);
             });
-
             temas.forEach(t => {
-                const opt = document.createElement("option");
-                opt.value = t.codTema;
-                opt.textContent = t.nome;
-                temaSelect.appendChild(opt);
+                const o = new Option(t.nome, t.codTema);
+                sel("codTema").append(o);
             });
         }
 
         async function listarOrcamentos() {
-            const response = await fetch("/orcamentos");
-            orcamentos = await response.json();
+            orcamentos = await fetch("/orcamentos").then(r => r.json());
             const tbody = document.getElementById("orcamentos-tbody");
             tbody.innerHTML = "";
-
             orcamentos.forEach(o => {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
           <td>${o.codOrcamento}</td>
           <td>${o.numContrato || "-"}</td>
-          <td>R$ ${o.valorInicial?.toFixed(2) || "0,00"}</td>
-          <td>R$ ${o.valorSinal?.toFixed(2) || "0,00"}</td>
+          <td>R$ ${o.valorInicial?.toFixed(2)||"0,00"}</td>
+          <td>R$ ${o.valorSinal?.toFixed(2)||"0,00"}</td>
           <td>${o.codCliente}</td>
-          <td>${o.dataAssinatura || "-"}</td>
+          <td>${o.dataAssinatura||"-"}</td>
           <td></td>
         `;
-
-                const botoesTd = tr.querySelector("td:last-child");
-
-                const editarBtn = document.createElement("button");
-                editarBtn.textContent = "Editar";
-                editarBtn.onclick = () => editarOrcamento(o.codOrcamento);
-
-                const excluirBtn = document.createElement("button");
-                excluirBtn.textContent = "Excluir";
-                excluirBtn.onclick = async () => {
-                    await fetch(`/orcamentos/${o.codOrcamento}`, { method: "DELETE" });
+                const td = tr.lastElementChild;
+                const btnE = document.createElement("button");
+                btnE.textContent = "Editar";
+                btnE.addEventListener("click", ()=> editarOrcamento(o));
+                const btnD = document.createElement("button");
+                btnD.textContent = "Excluir";
+                btnD.addEventListener("click", async ()=>{
+                    await fetch(`/orcamentos/${o.codOrcamento}/${o.numContrato}`, {method:"DELETE"});
                     await listarOrcamentos();
-                };
-
-                botoesTd.appendChild(editarBtn);
-                botoesTd.appendChild(excluirBtn);
-                tbody.appendChild(tr);
+                });
+                td.append(btnE, btnD);
+                tbody.append(tr);
             });
         }
 
-        function editarOrcamento(id) {
-            const o = orcamentos.find(x => x.codOrcamento == id);
-            if (!o) return;
-
-            document.getElementById("codOrcamento").value = o.codOrcamento;
-            document.getElementById("numContrato").value = o.numContrato || "";
-            document.getElementById("codCliente").value = o.codCliente;
+        function editarOrcamento(o) {
+            document.getElementById("codOrcamento").value   = o.codOrcamento;
+            document.getElementById("numContrato").value    = o.numContrato || "";
+            document.getElementById("codCliente").value     = o.codCliente;
             document.getElementById("codFuncionario").value = o.codFuncionario;
-            document.getElementById("codTema").value = o.codTema;
-            document.getElementById("dataFesta").value = o.dataFesta;
-            document.getElementById("horarioFesta").value = o.horarioFesta;
-            document.getElementById("valorInicial").value = o.valorInicial;
-            document.getElementById("localFesta").value = o.localFesta || "";
-            document.getElementById("diaSemana").value = o.diaSemana || "";
+            document.getElementById("codTema").value        = o.codTema;
+            document.getElementById("dataFesta").value      = o.dataFesta;
+            document.getElementById("horarioFesta").value   = o.horarioFesta;
+            document.getElementById("valorInicial").value   = o.valorInicial;
+            document.getElementById("localFesta").value     = o.localFesta || "";
+            document.getElementById("diaSemana").value      = o.diaSemana || "";
             document.getElementById("dataAssinatura").value = o.dataAssinatura || "";
-            document.getElementById("valorSinal").value = o.valorSinal || "";
+            document.getElementById("valorSinal").value     = o.valorSinal || "";
         }
 
-        async function salvarOrcamento(event) {
-            event.preventDefault();
-
-            const orcamento = {
-                codOrcamento: document.getElementById("codOrcamento").value || null,
-                numContrato: document.getElementById("numContrato").value || null,
-                codCliente: parseInt(document.getElementById("codCliente").value),
-                codFuncionario: parseInt(document.getElementById("codFuncionario").value),
-                codTema: parseInt(document.getElementById("codTema").value),
-                dataFesta: document.getElementById("dataFesta").value,
-                horarioFesta: document.getElementById("horarioFesta").value,
-                valorInicial: parseFloat(document.getElementById("valorInicial").value),
-                localFesta: document.getElementById("localFesta").value,
-                diaSemana: document.getElementById("diaSemana").value,
-                dataAssinatura: document.getElementById("dataAssinatura").value || null,
-                valorSinal: parseFloat(document.getElementById("valorSinal").value) || 0
+        async function salvarOrcamento(evt) {
+            evt.preventDefault();
+            const f = document.getElementById("form-orcamento");
+            const o = {
+                codOrcamento:   f.codOrcamento.value||null,
+                numContrato:    f.numContrato.value||null,
+                codCliente:     +f.codCliente.value,
+                codFuncionario: +f.codFuncionario.value,
+                codTema:        +f.codTema.value,
+                dataFesta:      f.dataFesta.value,
+                horarioFesta:   f.horarioFesta.value,
+                valorInicial:   parseFloat(f.valorInicial.value),
+                localFesta:     f.localFesta.value,
+                diaSemana:      f.diaSemana.value,
+                dataAssinatura: f.dataAssinatura.value||null,
+                valorSinal:     parseFloat(f.valorSinal.value)||0
             };
-
-            const method = orcamento.codOrcamento ? "PUT" : "POST";
-            const url = orcamento.codOrcamento ? `/orcamentos/${orcamento.codOrcamento}` : "/orcamentos";
-
+            const isEdit = !!o.codOrcamento;
+            const url = isEdit
+                ? `/orcamentos/${o.codOrcamento}/${o.numContrato}`
+                : "/orcamentos";
+            const method = isEdit ? "PUT" : "POST";
             await fetch(url, {
                 method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(orcamento)
+                headers: {"Content-Type":"application/json"},
+                body: JSON.stringify(o)
             });
-
-            document.getElementById("form-orcamento").reset();
+            f.reset();
             await listarOrcamentos();
         }
 
         function filtrarOrcamentos() {
-            const filtro = document.getElementById("filtroOrcamento").value.toLowerCase();
-            const linhas = document.querySelectorAll("#orcamentos-tbody tr");
-
-            linhas.forEach(linha => {
-                const codOrcamento = linha.children[0].textContent.toLowerCase();
-                const numContrato = linha.children[1].textContent.toLowerCase();
-                linha.style.display =
-                    codOrcamento.includes(filtro) || numContrato.includes(filtro)
-                        ? ""
-                        : "none";
+            const q = document.getElementById("filtroOrcamento").value.toLowerCase();
+            document.querySelectorAll("#orcamentos-tbody tr").forEach(tr=>{
+                const cod  = tr.children[0].textContent.toLowerCase();
+                const numC = tr.children[1].textContent.toLowerCase();
+                tr.style.display = (cod.includes(q)||numC.includes(q))?"":"none";
             });
         }
 
-        window.onload = async () => {
+        window.onload = async ()=>{
             await carregarDropdowns();
             await listarOrcamentos();
-            fetch("/sidebar.html")
-                .then(res => res.text())
-                .then(html => document.getElementById("sidebar-container").innerHTML = html);
+            fetch("/sidebar.html").then(r=>r.text()).then(html=>{
+                document.getElementById("sidebar-container").innerHTML = html;
+            });
         };
     </script>
 </head>
 <body>
 <div id="sidebar-container"></div>
-
 <div class="main-content">
     <h1>Cadastro de Orçamento / Contrato</h1>
-
     <form id="form-orcamento" onsubmit="salvarOrcamento(event)">
-        <input type="hidden" id="codOrcamento">
-
+        <input type="hidden" id="codOrcamento" name="codOrcamento">
         <label>Contrato Nº:</label>
-        <input type="text" id="numContrato">
-
+        <input type="text" id="numContrato" name="numContrato">
         <label>Cliente:</label>
-        <select id="codCliente" required></select>
-
+        <select id="codCliente" name="codCliente" required></select>
         <label>Funcionário:</label>
-        <select id="codFuncionario" required></select>
-
+        <select id="codFuncionario" name="codFuncionario" required></select>
         <label>Tema:</label>
-        <select id="codTema" required></select>
-
+        <select id="codTema" name="codTema" required></select>
         <label>Data da Festa:</label>
-        <input type="date" id="dataFesta" required>
-
+        <input type="date" id="dataFesta" name="dataFesta" required>
         <label>Horário da Festa:</label>
-        <input type="time" id="horarioFesta" required>
-
+        <input type="time" id="horarioFesta" name="horarioFesta" required>
         <label>Valor Inicial:</label>
-        <input type="number" id="valorInicial" step="0.01" required>
-
+        <input type="number" id="valorInicial" name="valorInicial" step="0.01" required>
         <label>Local da Festa:</label>
-        <input type="text" id="localFesta">
-
+        <input type="text" id="localFesta" name="localFesta">
         <label>Dia da Semana:</label>
-        <input type="text" id="diaSemana">
-
+        <input type="text" id="diaSemana" name="diaSemana">
         <label>Data da Assinatura:</label>
-        <input type="date" id="dataAssinatura">
-
+        <input type="date" id="dataAssinatura" name="dataAssinatura">
         <label>Valor do Sinal:</label>
-        <input type="number" id="valorSinal" step="0.01">
-
+        <input type="number" id="valorSinal" name="valorSinal" step="0.01">
         <button type="submit">Salvar</button>
     </form>
-
     <h2>Lista de Orçamentos</h2>
-
-    <input type="text" id="filtroOrcamento" placeholder="🔍 Buscar por código do orçamento ou número do contrato..." oninput="filtrarOrcamentos()" class="barra-pesquisa">
-
+    <input type="text" id="filtroOrcamento" class="barra-pesquisa"
+           placeholder="🔍 Buscar código ou contrato..." oninput="filtrarOrcamentos()">
     <table>
         <thead>
         <tr>
-            <th>Código do Orçamento</th>
-            <th>Número do Contrato</th>
-            <th>Valor Inicial</th>
-            <th>Valor do Sinal</th>
-            <th>Código do Cliente</th>
-            <th>Data da Assinatura</th>
-            <th>Ações</th>
+            <th>Código</th><th>Contrato Nº</th><th>Valor Inicial</th>
+            <th>Valor do Sinal</th><th>Cliente</th><th>Data Assinatura</th><th>Ações</th>
         </tr>
         </thead>
         <tbody id="orcamentos-tbody"></tbody>
